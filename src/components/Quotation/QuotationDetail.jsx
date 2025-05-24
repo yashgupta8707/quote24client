@@ -12,7 +12,7 @@ import {
   Form,
 } from "react-bootstrap";
 import { quotationService } from "../../services/api";
-import QuotationPDFButton from "./QuotationPdfButton";
+import QuotationPDFButton from "./QuotationPDFButton";
 
 const QuotationDetail = () => {
   const { id } = useParams();
