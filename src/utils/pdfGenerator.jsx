@@ -1,15 +1,7 @@
 // client/src/utils/pdfGenerator.js
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import logo from "/logo.png"; // Adjust the path as necessary
-import img1 from "/1.png";
-import img2 from "/2.png";
-import img3 from "/3.png";
-import img4 from "/4.png";
-import img5 from "/5.png";
-import img6 from "/6.png";
-import img7 from "/7.png";
-import img8 from "/8.png";
+import logo from "/logo.png";
 
 export const generateQuotationPDF = (quotation) => {
   try {
@@ -52,70 +44,6 @@ export const generateQuotationPDF = (quotation) => {
         100
       );
       doc.setGState(new doc.GState({ opacity: 1 }));
-
-      // RAM watermark (top-left)
-      doc.setFontSize(20);
-      doc.setGState(new doc.GState({ opacity: 0.4 }));
-      doc.addImage(img8, "PNG", 35, 40, 60, 40);
-      doc.setGState(new doc.GState({ opacity: 0.1 }));
-      // GPU watermark (top-right)
-      doc.setFontSize(20);
-      doc.text("GPU", pageWidth - 35, 80, { angle: -20 });
-      doc.setFontSize(10);
-      doc.text("GRAPHICS", pageWidth - 45, 87, { angle: -20 });
-
-      // SSD watermark (center-right)
-      doc.setFontSize(20);
-      doc.text("SSD", pageWidth - 40, pageHeight / 2, { angle: -10 });
-      doc.setFontSize(10);
-      doc.text("STORAGE", pageWidth - 50, pageHeight / 2 + 7, { angle: -10 });
-
-      // CPU watermark (bottom-left)
-      doc.setFontSize(20);
-      doc.text("CPU", 30, pageHeight - 60, { angle: -15 });
-      doc.setFontSize(10);
-      doc.text("PROCESSOR", 25, pageHeight - 53, { angle: -15 });
-
-      // Motherboard watermark (bottom-right)
-      doc.setFontSize(20);
-      doc.text("MOBO", pageWidth - 45, pageHeight - 70, { angle: 25 });
-      doc.setFontSize(10);
-      doc.text("MAINBOARD", pageWidth - 55, pageHeight - 63, { angle: 25 });
-
-      // PSU watermark (left-center)
-      doc.setFontSize(20);
-      doc.text("PSU", 25, pageHeight / 2 + 30, { angle: 90 });
-      doc.setFontSize(10);
-      doc.text("POWER", 20, pageHeight / 2 + 50, { angle: 90 });
-
-      // Additional tech terms
-      doc.setFontSize(15);
-      doc.text("GAMING", pageWidth / 2 - 60, 90, { angle: 30 });
-      doc.text("CUSTOM", pageWidth / 2 + 40, pageHeight - 40, { angle: -30 });
-      doc.text("BUILD", pageWidth / 4, pageHeight - 90, { angle: 45 });
-      doc.text("TECH", (3 * pageWidth) / 4, 100, { angle: -45 });
-
-      // Circuit elements
-      doc.setFontSize(8);
-      doc.text("[ ]", 15, 100);
-      doc.text("[ ]", pageWidth - 25, 110);
-      doc.text("[ ]", 30, pageHeight - 30);
-      doc.text("[ ]", pageWidth - 40, pageHeight - 35);
-
-      // Binary code pattern
-      doc.setFontSize(6);
-      doc.text("01001100 01101111 01110010 01100101", pageWidth / 2 - 40, 130, {
-        angle: 15,
-      });
-      doc.text("01101101 00100000 01101001 01110000", pageWidth / 2 - 30, 140, {
-        angle: 15,
-      });
-      doc.text("01110011 01110101 01101101 00100000", pageWidth / 2 - 20, 150, {
-        angle: 15,
-      });
-
-      // Reset opacity
-      doc.setGState(new doc.GState({ opacity: 1 }));
     };
 
     // Add enhanced watermarks first
@@ -124,36 +52,23 @@ export const generateQuotationPDF = (quotation) => {
     // Header Section
     addColoredRect(0, 0, pageWidth, 35, primaryColor);
 
-    // // Logo area with better styling
-    // doc.setFillColor(255, 255, 255);
-    // doc.rect(10, 5, 25, 25, 'F');
-
-    // // Add subtle border to logo area
-    // doc.setDrawColor(...primaryColor);
-    // doc.setLineWidth(0.5);
-    // doc.rect(10, 5, 25, 25, 'S');
-
     doc.setTextColor(...primaryColor);
     doc.setFontSize(11);
     doc.setFont("helvetica", "bold");
-    doc.addImage(logo, "PNG", 6, 2, 30, 30);
+    doc.addImage(logo, "PNG", 2, 1.5, 30, 30);
 
     // Company Name and Details
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(20);
     doc.setFont("helvetica", "bold");
-    doc.text("Empress PC", 40, 15);
+    doc.text("EMPRESSPC.IN", 28, 14);
 
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    doc.text("MS-101, Sector D, Aliganj, Lucknow", 40, 22);
-    doc.text("Phone no.: 8881123430", 40, 27);
-    doc.text("Email: sales@empresspc.in", 40, 32);
-
-    // Quotation title and details (right side)
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text("Estimate", pageWidth - 15, 15, { align: "right" });
+    doc.text("MS-101, Sector D, Aliganj, Lucknow", 28, 18);
+    doc.text("Phone no.: 8881123430", 28, 22);
+    doc.text("Email: sales@empresspc.in", 28, 26);
+    doc.text("GSTIN: 09AALCD1630P1Z9", 28, 30);
 
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
@@ -163,41 +78,23 @@ export const generateQuotationPDF = (quotation) => {
       : new Date().toLocaleDateString("en-IN");
     const placeOfSupply = quotation.party.address || "09-Uttar Pradesh";
 
-    doc.text(`Estimate No.: ${quotationNo}`, pageWidth - 15, 22, {
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Estimate No.: ${quotationNo}`, pageWidth - 13, 13, {
       align: "right",
     });
-    doc.text(`Date: ${quotationDate}`, pageWidth - 15, 27, { align: "right" });
-    doc.text(`Place of supply: ${placeOfSupply}`, pageWidth - 15, 32, {
-      align: "right",
-    });
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Date: ${quotationDate}`, pageWidth - 13, 22, { align: "right" });
 
     // Company and Client details section
     doc.setTextColor(...textColor);
     let yPos = 45;
 
-    // Company info box with border only (transparent background)
-    doc.setDrawColor(...borderColor);
-    doc.setLineWidth(0.5);
-    doc.rect(10, yPos, (pageWidth - 20) / 2 - 5, 25, "S"); // 'S' for stroke only (border)
-
-    doc.setTextColor(...textColor);
+    // Client info - LEFT SIDE WITHOUT BACKGROUND (UPDATED SECTION)
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
-    doc.text("From:", 12, yPos + 5);
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.text("EMPRESSPC.IN", 12, yPos + 10);
-    doc.text("MS-101, Sector D, Aliganj, Lucknow", 12, yPos + 14);
-    doc.text("GSTIN: 09AALCD1630P1Z9", 12, yPos + 18);
-    doc.text("State: 09-Uttar Pradesh", 12, yPos + 22);
-
-    // Client info box
-    const clientX = pageWidth / 2 + 5;
-    addColoredRect(clientX, yPos, (pageWidth - 20) / 2 - 5, 25, lightGray);
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "bold");
-    doc.text("Estimate For:", clientX + 2, yPos + 5);
+    doc.text("Estimate For:", 10, yPos + 5);
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
@@ -205,15 +102,15 @@ export const generateQuotationPDF = (quotation) => {
     const partyPhone = quotation.party.phone || "N/A";
     const partyAddress = quotation.party.address || "Address";
 
-    doc.text(`${partyName}(${partyPhone})`, clientX + 2, yPos + 10);
+    doc.text(`${partyName} (${partyPhone})`, 10, yPos + 10);
 
     // Handle address wrapping
     const addressLines = doc.splitTextToSize(partyAddress, 80);
     addressLines.slice(0, 2).forEach((line, index) => {
-      doc.text(line, clientX + 2, yPos + 14 + index * 4);
+      doc.text(line, 10, yPos + 14 + index * 4);
     });
 
-    doc.text(`Contact No.: ${partyPhone}`, clientX + 2, yPos + 22);
+    doc.text(`Contact No.: ${partyPhone}`, 10, yPos + 22);
 
     // Components Table
     yPos += 35;
@@ -264,8 +161,8 @@ export const generateQuotationPDF = (quotation) => {
       },
       columnStyles: {
         0: { cellWidth: pageWidth * 0.06, halign: "center" },
-        1: { cellWidth: pageWidth * 0.15, fontSize: 8, halign: "center" },
-        2: { cellWidth: pageWidth * 0.53, fontSize: 8, halign: "center" },
+        1: { cellWidth: pageWidth * 0.15, fontSize: 8, halign: "left" },
+        2: { cellWidth: pageWidth * 0.53, fontSize: 8, halign: "left" },
         3: { cellWidth: 20, halign: "center" },
         5: { cellWidth: 15, halign: "center" },
       },
@@ -278,61 +175,6 @@ export const generateQuotationPDF = (quotation) => {
     // Get the final Y position after the table
     const finalY = doc.lastAutoTable.finalY + 10;
 
-    // // Amount in words section
-    // const totalAmount = quotation.totalAmount || 0;
-    // const amountInWords = convertNumberToWords(totalAmount);
-
-    // addColoredRect(10, finalY, pageWidth - 20, 15, lightGray);
-    // doc.setFontSize(9);
-    // doc.setFont("helvetica", "bold");
-    // doc.text("Estimate Amount in Words", 12, finalY + 5);
-    // doc.setFont("helvetica", "normal");
-    // doc.setFontSize(8);
-    // doc.text(amountInWords, 12, finalY + 10);
-
-    // // Financial Summary Section
-    // const summaryY = finalY + 20;
-    // addColoredRect(10, summaryY, pageWidth - 20, 10, lightGray);
-    // doc.setFontSize(9);
-    // doc.setFont("helvetica", "bold");
-    // doc.text("Amounts", 12, summaryY + 6);
-
-    // // Calculate totals
-    // const subtotal = totalAmount / 1.18;
-    // const gstAmount = totalAmount - subtotal;
-
-    // let summaryDetailY = summaryY + 15;
-    // doc.setFontSize(8);
-    // doc.setFont("helvetica", "normal");
-
-    // // Summary table
-    // const summaryData = [
-    //   ["Sub Total (without GST)", `₹${subtotal.toFixed(2)}`],
-    //   ["Total GST", `₹${gstAmount.toFixed(2)}`],
-    //   ["Total Amount", `₹${totalAmount.toFixed(2)}`],
-    // ];
-
-    // autoTable(doc, {
-    //   startY: summaryDetailY,
-    //   body: summaryData,
-    //   theme: "grid",
-    //   styles: {
-    //     fontSize: 8,
-    //     cellPadding: 2,
-    //     textColor: textColor,
-    //     lineColor: [200, 200, 200],
-    //     lineWidth: 0.1,
-    //   },
-    //   columnStyles: {
-    //     0: { cellWidth: pageWidth - 60, halign: "left" },
-    //     1: { cellWidth: 40, halign: "right", fontStyle: "bold" },
-    //   },
-    //   bodyStyles: {
-    //     2: { fillColor: lightGray, fontStyle: "bold" }, // Total row
-    //   },
-    //   margin: { left: 10, right: 10 },
-    // });
-
     // Amount in words and summary section - combined in one table
     const totalAmount = quotation.totalAmount || 0;
     const amountInWords = convertNumberToWords(totalAmount);
@@ -340,9 +182,7 @@ export const generateQuotationPDF = (quotation) => {
     // Create combined table with amount in words and totals
     const combinedTableData = [
       ["Estimate Amount in Words", "Total"],
-      [amountInWords, `₹${totalAmount.toLocaleString("en-IN")}`],
-      // ["Sub Total", `₹${totalAmount.toLocaleString("en-IN")}`],
-      // [`₹${totalAmount.toLocaleString("en-IN")}`],
+      [amountInWords, `Rs. ${totalAmount.toLocaleString("en-IN")}`],
     ];
 
     autoTable(doc, {
@@ -353,36 +193,54 @@ export const generateQuotationPDF = (quotation) => {
         fontSize: 8,
         cellPadding: 3,
         textColor: textColor,
-        lineColor: borderColor, // #26497a border color
+        lineColor: borderColor,
         lineWidth: 0.5,
       },
       columnStyles: {
         0: { cellWidth: (pageWidth - 20) * 0.65, halign: "left" },
-        1: { cellWidth: (pageWidth - 20) * 0.38, halign: "right" },
+        1: { cellWidth: (pageWidth - 20) * 0.35, halign: "center" },
       },
       bodyStyles: {
-        0: { fillColor: lightGray, fontStyle: "bold" }, // Header row
-        1: { fontStyle: "normal" }, // Amount in words row
-        2: { fontStyle: "normal" }, // Sub Total row
-        3: { fillColor: lightGray, fontStyle: "bold" }, // Total row
+        0: { fillColor: lightGray, fontStyle: "bold" }, // Header row - both cells bold
+        1: {
+          0: { fontStyle: "normal" }, // Amount in words - normal
+          1: { fontStyle: "bold" }, // Total amount - bold
+        },
       },
-      margin: { left: 10, right: 20 },
+      margin: { left: 10, right: 15 },
     });
 
-    // Bottom section: Bank Details and Terms
-    const bottomY = doc.lastAutoTable.finalY + 10;
+    // Calculate footer position - stick to bottom
+    const footerHeight = 25;
+    const footerY = pageHeight - footerHeight;
 
-    // Bank Details (left) and Terms (right)
+    // Calculate bank details and terms position - right above footer
+    const bankTermsHeight = 35;
+    const bottomY = footerY - bankTermsHeight - 5;
+
+    // Bank Details (left) and Terms (right) - Enhanced styling
     const bankDetailsX = 10;
     const termsX = pageWidth / 2 + 5;
     const sectionWidth = (pageWidth - 30) / 2;
 
-    // Bank Details
-    addColoredRect(bankDetailsX, bottomY, sectionWidth, 30, lightGray);
+    // Bank Details with enhanced border
+    doc.setDrawColor(...primaryColor);
+    doc.setLineWidth(1);
+    addColoredRect(
+      bankDetailsX,
+      bottomY,
+      sectionWidth,
+      bankTermsHeight,
+      lightGray
+    );
+    doc.rect(bankDetailsX, bottomY, sectionWidth, bankTermsHeight, "S"); // Add border
+
+    doc.setTextColor(...primaryColor);
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
     doc.text("Bank Details", bankDetailsX + 2, bottomY + 6);
 
+    doc.setTextColor(...textColor);
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
     doc.text(
@@ -399,12 +257,16 @@ export const generateQuotationPDF = (quotation) => {
     );
     doc.text("PRIVATE LIMITED", bankDetailsX + 2, bottomY + 28);
 
-    // Terms and Conditions
-    addColoredRect(termsX, bottomY, sectionWidth, 30, lightGray);
+    // Terms and Conditions with enhanced border
+    addColoredRect(termsX, bottomY, sectionWidth, bankTermsHeight, lightGray);
+    doc.rect(termsX, bottomY, sectionWidth, bankTermsHeight, "S"); // Add border
+
+    doc.setTextColor(...primaryColor);
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
     doc.text("Terms and conditions", termsX + 2, bottomY + 6);
 
+    doc.setTextColor(...textColor);
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
     const terms = [
@@ -418,23 +280,15 @@ export const generateQuotationPDF = (quotation) => {
       doc.text(term, termsX + 4, bottomY + 12 + index * 4);
     });
 
-    // Footer with signature and enhanced styling
-    const footerY = bottomY + 95;
-    addColoredRect(0, footerY - 5, pageWidth, 25, primaryColor);
+    // Footer with signature and enhanced styling - Now at bottom
+    addColoredRect(0, footerY, pageWidth, footerHeight, primaryColor);
 
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    // doc.text("For: Empress PC", 10, footerY + 3);
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    doc.text("Authorized Signatory", 10, footerY + 12);
-
-    // // Tech-style decoration in footer
-    // doc.setFontSize(12);
-    // doc.text("◆", pageWidth / 2 - 30, footerY + 8);
-    // doc.text("◆", pageWidth / 2, footerY + 8);
-    // doc.text("◆", pageWidth / 2 + 30, footerY + 8);
+    doc.text("Authorized Signatory", 10, footerY + 21);
 
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
@@ -442,16 +296,16 @@ export const generateQuotationPDF = (quotation) => {
       `Generated: ${new Date().toLocaleDateString(
         "en-IN"
       )} ${new Date().toLocaleTimeString("en-IN")}`,
-      pageWidth - 10,
-      footerY + 8,
+      pageWidth - 5,
+      footerY + 22,
       { align: "right" }
     );
-    doc.text(
-      "Custom PC Solutions & Premium Components",
-      pageWidth - 10,
-      footerY + 14,
-      { align: "right" }
-    );
+    // doc.text(
+    //   "Custom PC Solutions & Premium Components",
+    //   pageWidth - 10,
+    //   footerY + 14,
+    //   { align: "right" }
+    // );
 
     return doc;
   } catch (error) {
