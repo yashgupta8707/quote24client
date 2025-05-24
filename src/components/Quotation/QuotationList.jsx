@@ -13,7 +13,7 @@ import {
   InputGroup,
 } from "react-bootstrap";
 import { quotationService } from "../../services/api";
-import QuotationPDFButton from "./QuotationPdfButton";
+import QuotationPDFButton from "./QuotationPDFButton";
 
 const QuotationList = () => {
   const [quotations, setQuotations] = useState([]);
