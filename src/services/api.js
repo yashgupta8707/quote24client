@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const baseURL = 'https://quote24server.onrender.com/api';
+// const baseURL = 'https://quote24server.onrender.com/api';
+const baseURL = 'http://localhost:5000/api';
+
 
 const api = axios.create({
   baseURL,

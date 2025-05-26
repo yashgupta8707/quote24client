@@ -22,6 +22,7 @@ import ComponentsList from './components/ComponentLibrary/ComponentsList';
 // CSS
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import EstimatePrint from './components/EstimatePrint';
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
             <Route path="/quotations/edit/:id" element={<QuotationForm />} />
             <Route path="/quotations/revise/:reviseId" element={<QuotationForm />} />
             <Route path="/quotations/:id" element={<QuotationDetail />} />
+            <Route path="/estimate" element={<EstimatePrint />} />
             
             {/* Component Library */}
             <Route path="/components" element={<ComponentsList />} />
