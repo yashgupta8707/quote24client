@@ -721,6 +721,7 @@ const EstimatePrint = ({
                   <div className="pdf-terms-block">
                     <h5>Terms and conditions</h5>
                     <p>1. Quote Is Valid For 7 Days Only!</p>
+                    <p>2. Any advance Received Against An Estimate Is Non Refundable Under Any Circumstances.</p>
                   </div>
                 </div>
 

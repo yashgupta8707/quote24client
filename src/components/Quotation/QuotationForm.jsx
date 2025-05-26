@@ -146,7 +146,7 @@ const QuotationForm = () => {
       purchaseWithGst: purchaseWithGst,
       salesWithoutGst: salesWithoutGst,
       salesWithGst: salesWithGst,
-      margin: Number((salesWithGst - purchaseWithGst).toFixed(2))
+      margin: Number((salesWithoutGst - purchaseWithoutGst).toFixed(2))
     };
     
     setComponents(prev => [...prev, newComponent]);

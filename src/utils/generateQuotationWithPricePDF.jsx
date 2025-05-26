@@ -625,14 +625,14 @@ const createEstimateHTML = (quotation) => {
         /* QR code in bank details */
         .qr-code {
           position: absolute !important;
-          bottom: 6mm !important;
-          right: 6mm !important;
+          bottom: 3mm !important;
+          right: 3mm !important;
           text-align: center !important;
         }
 
         .qr-code img {
-          width: 15mm !important;
-          height: 15mm !important;
+          width: 8mm !important;
+          height: 8mm !important;
           margin-bottom: 1mm !important;
           -webkit-print-color-adjust: exact !important;
           print-color-adjust: exact !important;
@@ -805,8 +805,7 @@ const createEstimateHTML = (quotation) => {
             <!-- Bank Details -->
             <div class="bottom-column bank-column">
               <h5>Bank Details</h5>
-              <p><strong>Name:</strong> KOTAK MAHINDRA BANK LIMITED, LUCKNOW</p>
-              <p>AMINABAD BRANCH</p>
+              <p><strong>Name:</strong> KOTAK MAHINDRA BANK LIMITED, LUCKNOW AMINABAD BRANCH</p>
               <p><strong>Account No.:</strong> 8707304202</p>
               <p><strong>IFSC code:</strong> KKBK0005194</p>
               <p><strong>Account holder's name:</strong> DIGINEXT PRO SOLUTIONS PRIVATE LIMITED</p>
@@ -814,6 +813,7 @@ const createEstimateHTML = (quotation) => {
               <!-- QR Code -->
               <div class="qr-code">
                 <img src="/qr.png" alt="QR Code" />
+                <p>Pay</p>
               </div>
             </div>
 
@@ -821,7 +821,6 @@ const createEstimateHTML = (quotation) => {
             <div class="bottom-column terms-column">
               <h5>Terms and conditions</h5>
               <p>1. Quote Is Valid For 7 Days Only!</p>
-              <p>2. Any advance Received Against An Estimate Is Non Refundable Under Any Circumstances.</p>
             </div>
 
             <!-- Authorized Signatory -->
@@ -1051,7 +1050,7 @@ const createEstimateWithPriceHTML = (quotation) => {
         }
 
         .company-details p {
-          font-size: 11px !important;
+          font-size: 9px !important;
           margin-bottom: 0.5mm !important;
           line-height: 1.2 !important;
         }
@@ -1064,7 +1063,7 @@ const createEstimateWithPriceHTML = (quotation) => {
         .estimate-info td {
           border: 1px solid #000 !important;
           padding: 2mm !important;
-          font-size: 11px !important;
+          font-size: 9px !important;
           vertical-align: middle !important;
         }
 
@@ -1084,14 +1083,14 @@ const createEstimateWithPriceHTML = (quotation) => {
         }
 
         .customer-section h4 {
-          font-size: 12px !important;
+          font-size: 10px !important;
           font-weight: bold !important;
           text-decoration: underline !important;
           margin-bottom: 2mm !important;
         }
 
         .customer-section p {
-          font-size: 11px !important;
+          font-size: 9px !important;
           margin-bottom: 1mm !important;
           line-height: 1.2 !important;
         }
@@ -1231,14 +1230,14 @@ const createEstimateWithPriceHTML = (quotation) => {
         /* QR code in bank details */
         .qr-code {
           position: absolute !important;
-          bottom: 6mm !important;
-          right: 5mm !important;
+          bottom: 3mm !important;
+          right: 3mm !important;
           text-align: center !important;
         }
 
         .qr-code img {
-          width: 14mm !important;
-          height: 14mm !important;
+          width: 8mm !important;
+          height: 8mm !important;
           margin-bottom: 1mm !important;
           -webkit-print-color-adjust: exact !important;
           print-color-adjust: exact !important;
@@ -1414,8 +1413,7 @@ const createEstimateWithPriceHTML = (quotation) => {
             <!-- Bank Details -->
             <div class="bottom-column bank-column">
               <h5>Bank Details</h5>
-              <p><strong>Name:</strong> KOTAK MAHINDRA BANK LIMITED, LUCKNOW</p>
-              <p>AMINABAD BRANCH</p>
+              <p><strong>Name:</strong> KOTAK MAHINDRA BANK LIMITED, LUCKNOW AMINABAD BRANCH</p>
               <p><strong>Account No.:</strong> 8707304202</p>
               <p><strong>IFSC code:</strong> KKBK0005194</p>
               <p><strong>Account holder's name:</strong> DIGINEXT PRO SOLUTIONS PRIVATE LIMITED</p>
@@ -1423,6 +1421,7 @@ const createEstimateWithPriceHTML = (quotation) => {
               <!-- QR Code -->
               <div class="qr-code">
                 <img src="/qr.png" alt="QR Code" />
+                <p>Pay</p>
               </div>
             </div>
 
@@ -1430,7 +1429,6 @@ const createEstimateWithPriceHTML = (quotation) => {
             <div class="bottom-column terms-column">
               <h5>Terms and conditions</h5>
               <p>1. Quote Is Valid For 7 Days Only!</p>
-              <p>2. Any advance Received Against An Estimate Is Non Refundable Under Any Circumstances.</p>
             </div>
 
             <!-- Authorized Signatory -->
