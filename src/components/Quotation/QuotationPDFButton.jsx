@@ -16,8 +16,8 @@ const QuotationPDFButton = ({ quotation, variant = 'primary', size = 'sm' }) => 
         return;
       }
       
-      // Generate PDF (now synchronous again)
-      const pdf = generateQuotationPDF(quotation);
+      // Generate PDF (now async with HTML-to-PDF conversion)
+      const pdf = await generateQuotationPDF(quotation);
       
       // Create filename
       const partyName = quotation.party.name || 'customer';
@@ -53,7 +53,7 @@ const QuotationPDFButton = ({ quotation, variant = 'primary', size = 'sm' }) => 
             aria-hidden="true"
             className="me-2"
           />
-          Generating...
+          Generating PDF...
         </>
       ) : (
         <>

@@ -1,236 +1,334 @@
 // client/src/components/Navigation.js
-import React from "react";
-import { Navbar, Nav, Container, Badge } from "react-bootstrap";
+import React, { useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 
 const Navigation = () => {
   const location = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const navStyle = {
-    background:
-      "linear-gradient(135deg, #ff8c00 0%, #ff7700 50%, #ff6600 100%)",
-    boxShadow: "0 2px 10px rgba(255, 140, 0, 0.3)",
-    borderBottom: "3px solid #ff6600",
-  };
-
-  const brandStyle = {
-    fontWeight: "bold",
-    fontSize: "1.5rem",
-    color: "#fff",
-    textDecoration: "none",
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-  };
-
-  const logoStyle = {
-    width: "40px",
-    height: "40px",
-    backgroundColor: "#fff",
-    borderRadius: "8px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "1.2rem",
-    fontWeight: "bold",
-    color: "#ff6600",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-  };
-
-  const navLinkStyle = {
-    color: "#fff !important",
-    fontWeight: "500",
-    margin: "0 5px",
-    padding: "8px 16px",
-    borderRadius: "20px",
-    transition: "all 0.3s ease",
-    border: "2px solid transparent",
-  };
-
-  const activeNavLinkStyle = {
-    ...navLinkStyle,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    border: "2px solid rgba(255, 255, 255, 0.3)",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
   };
 
   return (
     <>
-      <style>
-        {`
+      <style dangerouslySetInnerHTML={{
+        __html: `
           .custom-navbar {
-            background: linear-gradient(135deg, #5d4d3a 0%, #ff7700 50%, #6a5445 100%) !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(135deg, #9f8769 0%, #ff7700 50%, #a0795e 100%);
+            box-shadow: 0 2px 10px rgba(255, 140, 0, 30);
+            border-bottom: 3px solid #ff6600;
+            z-index: 1030;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
           }
           
-          .custom-navbar .navbar-brand:hover {
+          .navbar-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+          }
+          
+          .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white !important;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+          }
+          
+          .navbar-brand:hover {
+            color: white !important;
+            text-decoration: none;
             transform: scale(1.05);
             transition: transform 0.3s ease;
           }
           
-          .custom-nav-link {
-            color: #fff !important;
+          .brand-logo {
+            width: 40px;
+            height: 40px;
+            background-color: #fff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ff6600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+          }
+          
+          .navbar-brand img {
+            height: 70px;
+          }
+          
+          .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex-direction: row;
+          }
+          
+          .navbar-nav li {
+            display: inline-block;
+          }
+          
+          .nav-link {
+            color: white !important;
+            text-decoration: none !important;
             font-weight: 500;
             margin: 0 5px;
             padding: 8px 16px;
             border-radius: 20px;
             transition: all 0.3s ease;
             border: 2px solid transparent;
-            text-decoration: none !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            vertical-align: middle;
           }
           
-          .custom-nav-link:hover {
+          .nav-link:hover {
+            color: white !important;
+            text-decoration: none !important;
             background-color: rgba(255, 255, 255, 0.15) !important;
             border: 2px solid rgba(255, 255, 255, 0.2) !important;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
           }
           
-          .custom-nav-link.active {
+          .nav-link.active {
             background-color: rgba(255, 255, 255, 0.25) !important;
             border: 2px solid rgba(255, 255, 255, 0.4) !important;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             font-weight: 600;
           }
           
-          .navbar-toggler {
-            border: 2px solid rgba(255, 255, 255, 0.3) !important;
-            padding: 4px 8px;
+          .nav-link i {
+            margin-right: 8px;
+            font-size: 1rem;
+            width: 16px;
+            text-align: center;
           }
           
-          .navbar-toggler:focus {
+          .navbar-badge {
+            background: #fff;
+            color: #333;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            font-weight: 500;
+            display: inline-block;
+            vertical-align: middle;
+          }
+          
+          .navbar-toggle {
+            display: none;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2rem;
+          }
+          
+          .navbar-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+          }
+          
+          .navbar-toggle:focus {
+            outline: none;
             box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
           }
           
-          .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+          /* Mobile styles */
+          @media (max-width: 991px) {
+            .custom-navbar {
+              height: auto;
+              min-height: 80px;
+              flex-direction: column;
+              align-items: flex-start;
+              padding: 15px 20px;
+            }
+            
+            .navbar-container {
+              flex-direction: column;
+              align-items: flex-start;
+              width: 100%;
+            }
+            
+            .navbar-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              width: 100%;
+            }
+            
+            .navbar-toggle {
+              display: block;
+            }
+            
+            .navbar-nav {
+              flex-direction: column;
+              width: 100%;
+              margin-top: 15px;
+              gap: 5px;
+              display: ${isMenuOpen ? 'flex' : 'none'};
+            }
+            
+            .navbar-nav li {
+              display: block;
+              width: 100%;
+            }
+            
+            .nav-link {
+              width: 100%;
+              text-align: center;
+              justify-content: center;
+              margin: 5px 0;
+              display: flex;
+            }
+          }
+          
+          /* Body padding to prevent content hiding */
+          body {
+            padding-top: 90px !important;
           }
           
           @media (max-width: 991px) {
-            .custom-nav-link {
-              margin: 5px 0;
-              text-align: center;
+            body {
+              padding-top: 100px !important;
             }
           }
-        `}
-      </style>
+        `
+      }} />
 
-      <Navbar
-        expand="lg"
-        fixed="top"
-        className="custom-navbar"
-        style={navStyle}
-      >
-        <Container>
-          <Navbar.Brand
-            as={Link}
-            to="/"
-            style={brandStyle}
-            className="d-flex align-items-center"
-          >
-            <img
-              src="/logo.png"
-              alt="EmpressPC Logo"
-              style={{ height: "70px" }}
-            />
-            <div>
-              <div style={{ fontSize: "1.4rem", lineHeight: "1" }}>
-                EMPRESSPC.IN
+      <nav className="custom-navbar">
+        <div className="navbar-container">
+          <div className="navbar-header">
+            <Link to="/" className="navbar-brand">
+              <img
+                src="/logo.png"
+                alt="EmpressPC Logo"
+                style={{ height: "70px" }}
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
+              <div>
+                <div style={{ fontSize: "1.4rem", lineHeight: "1" }}>
+                  EMPRESSPC.IN
+                </div>
               </div>
-              {/* <div style={{ fontSize: '0.7rem', opacity: '0.9', letterSpacing: '1px' }}>.IN</div> */}
-            </div>
-          </Navbar.Brand>
+            </Link>
+            
+            <button 
+              className="navbar-toggle"
+              onClick={toggleMenu}
+              aria-controls="basic-navbar-nav"
+            >
+              <span>☰</span>
+            </button>
+          </div>
 
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto">
-              <Nav.Link
-                as={NavLink}
+          <ul className="navbar-nav">
+            <li>
+              <NavLink
                 to="/dashboard"
-                className={`custom-nav-link ${
-                  location.pathname === "/dashboard" ||
-                  location.pathname === "/"
-                    ? "active"
-                    : ""
+                className={`nav-link ${
+                  location.pathname === "/dashboard" || location.pathname === "/" ? "active" : ""
                 }`}
               >
-                <i className="fas fa-tachometer-alt me-2"></i>
+                <i className="fas fa-tachometer-alt"></i>
                 Dashboard
-              </Nav.Link>
+              </NavLink>
+            </li>
 
-              <Nav.Link
-                as={NavLink}
+            <li>
+              <NavLink
                 to="/parties"
-                className={`custom-nav-link ${
+                className={`nav-link ${
                   location.pathname.includes("/parties") ? "active" : ""
                 }`}
               >
-                <i className="fas fa-users me-2"></i>
+                <i className="fas fa-users"></i>
                 Clients
-                <Badge
-                  bg="light"
-                  text="dark"
-                  className="ms-2"
-                  style={{ fontSize: "0.7rem" }}
-                >
-                  CRM
-                </Badge>
-              </Nav.Link>
+                <span className="navbar-badge">CRM</span>
+              </NavLink>
+            </li>
 
-              <Nav.Link
-                as={NavLink}
+            <li>
+              <NavLink
                 to="/quotations"
-                className={`custom-nav-link ${
+                className={`nav-link ${
                   location.pathname.includes("/quotations") ? "active" : ""
                 }`}
               >
-                <i className="fas fa-file-invoice-dollar me-2"></i>
+                <i className="fas fa-file-invoice-dollar"></i>
                 Quotations
-              </Nav.Link>
+              </NavLink>
+            </li>
 
-              <Nav.Link
-                as={NavLink}
+            <li>
+              <NavLink
                 to="/components"
-                className={`custom-nav-link ${
+                className={`nav-link ${
                   location.pathname.includes("/components") ? "active" : ""
                 }`}
               >
-                <i className="fas fa-microchip me-2"></i>
+                <i className="fas fa-microchip"></i>
                 Components
-              </Nav.Link>
-            </Nav>
+              </NavLink>
+            </li>
 
-            <Nav className="ms-auto">
-              <Nav.Link
+            <li>
+              <a
                 href="#"
-                className="custom-nav-link"
+                className="nav-link"
                 onClick={(e) => {
                   e.preventDefault();
                   // Add settings/profile functionality here
                 }}
               >
-                <i className="fas fa-cog me-2"></i>
+                <i className="fas fa-cog"></i>
                 Settings
-              </Nav.Link>
+              </a>
+            </li>
 
-              <Nav.Link
+            <li>
+              <a
                 href="#"
-                className="custom-nav-link"
+                className="nav-link"
                 onClick={(e) => {
                   e.preventDefault();
                   // Add help/support functionality here
                 }}
               >
-                <i className="fas fa-question-circle me-2"></i>
+                <i className="fas fa-question-circle"></i>
                 Help
-              </Nav.Link>
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
-
-      {/* Add padding to body content so it doesn't hide behind fixed navbar */}
-      <div style={{ paddingTop: "80px" }}></div>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
     </>
   );
 };

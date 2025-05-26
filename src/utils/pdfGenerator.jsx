@@ -1,355 +1,17 @@
 // client/src/utils/pdfGenerator.js
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import logo from "/logo.png";
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
-export const generateQuotationPDF = (quotation) => {
-  try {
-    // Validate input data
-    if (!quotation || !quotation.party || !quotation.components) {
-      throw new Error("Invalid quotation data");
-    }
-
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.width;
-    const pageHeight = doc.internal.pageSize.height;
-
-    // Colors - Exact orange theme from navbar
-    const primaryColor = [38, 73, 122]; // #26497a in RGB // Exact orange from your navbar
-    const secondaryColor = [245, 136, 69]; // Lighter variant
-    const textColor = [51, 51, 51]; // Dark gray
-    const lightGray = [248, 248, 248];
-    const watermarkColor = [215, 116, 49]; // Same orange for watermarks
-    const borderColor = [200, 200, 200];
-
-    // Helper function to add colored rectangle
-    const addColoredRect = (x, y, width, height, color) => {
-      doc.setFillColor(...color);
-      doc.rect(x, y, width, height, "F");
-    };
-
-    // Add enhanced PC component watermarks
-    const addEnhancedWatermarks = () => {
-      // Set low opacity for watermarks
-      doc.setGState(new doc.GState({ opacity: 0.08 }));
-      doc.setTextColor(...watermarkColor);
-
-      doc.setGState(new doc.GState({ opacity: 0.4 }));
-      doc.addImage(
-        logo,
-        "PNG",
-        (pageWidth - 100) / 2,
-        (pageHeight - 100) / 2,
-        100,
-        100
-      );
-      doc.setGState(new doc.GState({ opacity: 1 }));
-    };
-
-    // Add enhanced watermarks first
-    addEnhancedWatermarks();
-
-    // Header Section
-    addColoredRect(0, 0, pageWidth, 35, primaryColor);
-
-    doc.setTextColor(...primaryColor);
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "bold");
-    doc.addImage(logo, "PNG", 2, 1.5, 30, 30);
-
-    // Company Name and Details
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(20);
-    doc.setFont("helvetica", "bold");
-    doc.text("EMPRESSPC.IN", 28, 14);
-
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "normal");
-    doc.text("MS-101, Sector D, Aliganj, Lucknow", 28, 18);
-    doc.text("Phone no.: 8881123430", 28, 22);
-    doc.text("Email: sales@empresspc.in", 28, 26);
-    doc.text("GSTIN: 09AALCD1630P1Z9", 28, 30);
-
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "normal");
-    const quotationNo = quotation.title || "Q-2025-001";
-    const quotationDate = quotation.createdAt
-      ? new Date(quotation.createdAt).toLocaleDateString("en-IN")
-      : new Date().toLocaleDateString("en-IN");
-    const placeOfSupply = quotation.party.address || "09-Uttar Pradesh";
-
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text(`Estimate No.: ${quotationNo}`, pageWidth - 13, 13, {
-      align: "right",
-    });
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Date: ${quotationDate}`, pageWidth - 13, 22, { align: "right" });
-
-    // Company and Client details section
-    doc.setTextColor(...textColor);
-    let yPos = 45;
-
-    // Client info - LEFT SIDE WITHOUT BACKGROUND (UPDATED SECTION)
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "bold");
-    doc.text("Estimate For:", 10, yPos + 5);
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    const partyName = quotation.party.name || "Customer";
-    const partyPhone = quotation.party.phone || "N/A";
-    const partyAddress = quotation.party.address || "Address";
-
-    doc.text(`${partyName} (${partyPhone})`, 10, yPos + 10);
-
-    // Handle address wrapping
-    const addressLines = doc.splitTextToSize(partyAddress, 80);
-    addressLines.slice(0, 2).forEach((line, index) => {
-      doc.text(line, 10, yPos + 14 + index * 4);
-    });
-
-    doc.text(`Contact No.: ${partyPhone}`, 10, yPos + 22);
-
-    // Components Table
-    yPos += 35;
-
-    // Prepare table data - matching PrintMode structure
-    const tableData = [];
-    quotation.components.forEach((comp, index) => {
-      const categoryName =
-        comp.category && comp.category.name ? comp.category.name : "Category";
-      const brandName =
-        comp.brand && comp.brand.name ? comp.brand.name : "Brand";
-      const componentName =
-        comp.model && comp.model.name
-          ? comp.model.name
-          : comp.name || "Component";
-      const warranty = comp.warranty || "Standard";
-      const quantity = comp.quantity || 1;
-
-      tableData.push([
-        String(index + 1),
-        brandName,
-        componentName + "\n" + categoryName,
-        warranty,
-        String(quantity),
-        "Pcs",
-      ]);
-    });
-
-    // Create table matching PrintMode design
-    autoTable(doc, {
-      startY: yPos,
-      head: [["S.No.", "Brand", "Item name", "Warranty", "Qty(In Units)"]],
-      body: tableData,
-      theme: "grid",
-      styles: {
-        fontSize: 8,
-        cellPadding: 2,
-        textColor: textColor,
-        lineColor: [200, 200, 200],
-        lineWidth: 0.1,
-      },
-      headStyles: {
-        fillColor: lightGray,
-        textColor: textColor,
-        fontStyle: "bold",
-        fontSize: 8,
-        halign: "left",
-      },
-      columnStyles: {
-        0: { cellWidth: pageWidth * 0.06, halign: "center" },
-        1: { cellWidth: pageWidth * 0.15, fontSize: 8, halign: "left" },
-        2: { cellWidth: pageWidth * 0.53, fontSize: 8, halign: "left" },
-        3: { cellWidth: 20, halign: "center" },
-        5: { cellWidth: 15, halign: "center" },
-      },
-      alternateRowStyles: {
-        fillColor: [252, 252, 252],
-      },
-      margin: { left: 5, right: 5 },
-    });
-
-    // Get the final Y position after the table
-    const finalY = doc.lastAutoTable.finalY + 10;
-
-    // Amount in words and summary section - combined in one table
-    const totalAmount = quotation.totalAmount || 0;
-    const amountInWords = convertNumberToWords(totalAmount);
-
-    // Create combined table with amount in words and totals
-    const combinedTableData = [
-      ["Estimate Amount in Words", "Total"],
-      [amountInWords, `Rs. ${totalAmount.toLocaleString("en-IN")}`],
-    ];
-
-    autoTable(doc, {
-      startY: finalY,
-      body: combinedTableData,
-      theme: "grid",
-      styles: {
-        fontSize: 8,
-        cellPadding: 3,
-        textColor: textColor,
-        lineColor: borderColor,
-        lineWidth: 0.5,
-      },
-      columnStyles: {
-        0: { cellWidth: (pageWidth - 20) * 0.65, halign: "left" },
-        1: { cellWidth: (pageWidth - 20) * 0.35, halign: "center" },
-      },
-      bodyStyles: {
-        0: { fillColor: lightGray, fontStyle: "bold" }, // Header row - both cells bold
-        1: {
-          0: { fontStyle: "normal" }, // Amount in words - normal
-          1: { fontStyle: "bold" }, // Total amount - bold
-        },
-      },
-      margin: { left: 10, right: 15 },
-    });
-
-    // Calculate footer position - stick to bottom
-    const footerHeight = 25;
-    const footerY = pageHeight - footerHeight;
-
-    // Calculate bank details and terms position - right above footer
-    const bankTermsHeight = 35;
-    const bottomY = footerY - bankTermsHeight - 5;
-
-    // Bank Details (left) and Terms (right) - Enhanced styling
-    const bankDetailsX = 10;
-    const termsX = pageWidth / 2 + 5;
-    const sectionWidth = (pageWidth - 30) / 2;
-
-    // Bank Details with enhanced border
-    doc.setDrawColor(...primaryColor);
-    doc.setLineWidth(1);
-    addColoredRect(
-      bankDetailsX,
-      bottomY,
-      sectionWidth,
-      bankTermsHeight,
-      lightGray
-    );
-    doc.rect(bankDetailsX, bottomY, sectionWidth, bankTermsHeight, "S"); // Add border
-
-    doc.setTextColor(...primaryColor);
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "bold");
-    doc.text("Bank Details", bankDetailsX + 2, bottomY + 6);
-
-    doc.setTextColor(...textColor);
-    doc.setFontSize(7);
-    doc.setFont("helvetica", "normal");
-    doc.text(
-      "Name: KOTAK MAHINDRA BANK LIMITED",
-      bankDetailsX + 2,
-      bottomY + 12
-    );
-    doc.text("Account No.: 8707304202", bankDetailsX + 2, bottomY + 16);
-    doc.text("IFSC code: KKBK0005194", bankDetailsX + 2, bottomY + 20);
-    doc.text(
-      "Account holder: DIGINEXT PRO SOLUTIONS",
-      bankDetailsX + 2,
-      bottomY + 24
-    );
-    doc.text("PRIVATE LIMITED", bankDetailsX + 2, bottomY + 28);
-
-    // Terms and Conditions with enhanced border
-    addColoredRect(termsX, bottomY, sectionWidth, bankTermsHeight, lightGray);
-    doc.rect(termsX, bottomY, sectionWidth, bankTermsHeight, "S"); // Add border
-
-    doc.setTextColor(...primaryColor);
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "bold");
-    doc.text("Terms and conditions", termsX + 2, bottomY + 6);
-
-    doc.setTextColor(...textColor);
-    doc.setFontSize(7);
-    doc.setFont("helvetica", "normal");
-    const terms = [
-      "1. Quote Is Valid For 7 Days Only!",
-      "2. Payment terms: 100% advance",
-      "3. Delivery: Within 7 working days",
-      "4. Warranty: As per manufacturer",
-    ];
-
-    terms.forEach((term, index) => {
-      doc.text(term, termsX + 4, bottomY + 12 + index * 4);
-    });
-
-    // Footer with signature and enhanced styling - Now at bottom
-    addColoredRect(0, footerY, pageWidth, footerHeight, primaryColor);
-
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "normal");
-    doc.text("Authorized Signatory", 10, footerY + 21);
-
-    doc.setFontSize(7);
-    doc.setFont("helvetica", "normal");
-    doc.text(
-      `Generated: ${new Date().toLocaleDateString(
-        "en-IN"
-      )} ${new Date().toLocaleTimeString("en-IN")}`,
-      pageWidth - 5,
-      footerY + 22,
-      { align: "right" }
-    );
-    // doc.text(
-    //   "Custom PC Solutions & Premium Components",
-    //   pageWidth - 10,
-    //   footerY + 14,
-    //   { align: "right" }
-    // );
-
-    return doc;
-  } catch (error) {
-    console.error("Error generating PDF:", error);
-    throw new Error(`PDF generation failed: ${error.message}`);
-  }
-};
-
-// Helper function to convert number to words (improved Indian format)
+// Convert number to words function
 const convertNumberToWords = (amount) => {
   try {
     const ones = [
-      "",
-      "One",
-      "Two",
-      "Three",
-      "Four",
-      "Five",
-      "Six",
-      "Seven",
-      "Eight",
-      "Nine",
-      "Ten",
-      "Eleven",
-      "Twelve",
-      "Thirteen",
-      "Fourteen",
-      "Fifteen",
-      "Sixteen",
-      "Seventeen",
-      "Eighteen",
-      "Nineteen",
+      "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+      "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+      "Seventeen", "Eighteen", "Nineteen"
     ];
     const tens = [
-      "",
-      "",
-      "Twenty",
-      "Thirty",
-      "Forty",
-      "Fifty",
-      "Sixty",
-      "Seventy",
-      "Eighty",
-      "Ninety",
+      "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
     ];
 
     const convertHundreds = (num) => {
@@ -374,17 +36,14 @@ const convertNumberToWords = (amount) => {
     let result = "";
 
     if (rupees >= 10000000) {
-      // Crores
       result += convertHundreds(Math.floor(rupees / 10000000)) + "Crore ";
       rupees %= 10000000;
     }
     if (rupees >= 100000) {
-      // Lakhs
       result += convertHundreds(Math.floor(rupees / 100000)) + "Lakh ";
       rupees %= 100000;
     }
     if (rupees >= 1000) {
-      // Thousands
       result += convertHundreds(Math.floor(rupees / 1000)) + "Thousand ";
       rupees %= 1000;
     }
@@ -405,7 +64,590 @@ const convertNumberToWords = (amount) => {
   }
 };
 
-// Helper function to format currency
+// Create HTML template with exact formatting
+const createEstimateHTML = (quotation) => {
+  // Format quotation data
+  const estimateData = {
+    estimateNo: quotation.title || 'EPC/E/2526/00210',
+    date: quotation.createdAt 
+      ? new Date(quotation.createdAt).toLocaleDateString('en-IN') + ', ' + new Date(quotation.createdAt).toLocaleTimeString('en-IN')
+      : new Date().toLocaleDateString('en-IN') + ', ' + new Date().toLocaleTimeString('en-IN'),
+    placeOfSupply: '09-Uttar Pradesh',
+    customer: {
+      name: quotation.party.name || 'Customer Name',
+      address: quotation.party.address || 'Customer Address',
+      contact: quotation.party.phone || '0000000000',
+      state: '09-Uttar Pradesh'
+    },
+    items: quotation.components.map((comp, index) => ({
+      serial: index + 1,
+      category: comp.category?.name || 'Category',
+      brand: comp.brand?.name || 'Brand',
+      name: comp.model?.name || comp.name || 'Component',
+      warranty: comp.warranty || '1 Year',
+      quantity: comp.quantity || 1
+    })),
+    totals: {
+      quantity: quotation.components.reduce((sum, comp) => sum + (comp.quantity || 1), 0).toString(),
+      amount: `₹ ${quotation.totalAmount?.toLocaleString('en-IN') || '0'}`,
+      amountInWords: convertNumberToWords(quotation.totalAmount || 0),
+      finalTotal: `₹ ${quotation.totalAmount?.toLocaleString('en-IN') || '0'}`
+    }
+  };
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        * {
+          margin: 0 !important;
+          padding: 0 !important;
+          box-sizing: border-box !important;
+        }
+
+        html, body {
+          width: 210mm !important;
+          height: 297mm !important;
+          margin: 0 !important;
+          padding: 8mm 6mm !important;
+          font-family: Arial, sans-serif !important;
+          font-size: 10px !important;
+          line-height: 1.2 !important;
+          color: #000 !important;
+          background: white !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        .estimate-container {
+          width: 98% !important;
+          padding: 5mm !important;
+          height: 100% !important;
+          position: relative !important;
+        }
+
+        /* Watermark */
+        .watermark {
+          position: absolute !important;
+          top: 50% !important;
+          left: 50% !important;
+          transform: translate(-50%, -50%) rotate(-45deg) !important;
+          opacity: 0.08 !important;
+          z-index: 1 !important;
+          pointer-events: none !important;
+        }
+
+        .watermark img {
+          width: 120mm !important;
+          height: auto !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        .content {
+          position: relative !important;
+          z-index: 2 !important;
+          width: 100% !important;
+          height: 100% !important;
+        }
+
+        /* Title */
+        .estimate-title {
+          text-align: center !important;
+          font-size: 18px !important;
+          font-weight: bold !important;
+          margin-bottom: 4mm !important;
+          text-decoration: underline !important;
+        }
+
+        /* Header section */
+        .header-section {
+          border: 2px solid #000 !important;
+          margin-bottom: 3mm !important;
+          display: table !important;
+          width: 100% !important;
+        }
+
+        .header-row {
+          display: table-row !important;
+        }
+
+        .company-cell {
+          display: table-cell !important;
+          width: 60% !important;
+          padding: 3mm !important;
+          vertical-align: top !important;
+          border-right: 1px solid #000 !important;
+        }
+
+        .estimate-cell {
+          display: table-cell !important;
+          width: 40% !important;
+          padding: 3mm !important;
+          vertical-align: top !important;
+        }
+
+        .company-info {
+          display: flex !important;
+          align-items: flex-start !important;
+          gap: 3mm !important;
+        }
+
+        .company-logo {
+          width: 12mm !important;
+          height: 12mm !important;
+          flex-shrink: 0 !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        .company-details h3 {
+          font-size: 14px !important;
+          font-weight: bold !important;
+          margin-bottom: 1mm !important;
+        }
+
+        .company-details p {
+          font-size: 9px !important;
+          margin-bottom: 0.5mm !important;
+          line-height: 1.2 !important;
+        }
+
+        .estimate-info table {
+          width: 100% !important;
+          border-collapse: collapse !important;
+        }
+
+        .estimate-info td {
+          border: 1px solid #000 !important;
+          padding: 2mm !important;
+          font-size: 9px !important;
+          vertical-align: middle !important;
+        }
+
+        .estimate-label {
+          background-color: #f0f0f0 !important;
+          font-weight: bold !important;
+          width: 45% !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        /* Customer section */
+        .customer-section {
+          border: 1px solid #000 !important;
+          padding: 3mm !important;
+          margin-bottom: 3mm !important;
+        }
+
+        .customer-section h4 {
+          font-size: 10px !important;
+          font-weight: bold !important;
+          text-decoration: underline !important;
+          margin-bottom: 2mm !important;
+        }
+
+        .customer-section p {
+          font-size: 9px !important;
+          margin-bottom: 1mm !important;
+          line-height: 1.2 !important;
+        }
+
+        /* Items table */
+        .items-table {
+          width: 100% !important;
+          border: 2px solid #000 !important;
+          border-collapse: collapse !important;
+          margin-bottom: 3mm !important;
+        }
+
+        .items-table th {
+          background-color: #f0f0f0 !important;
+          border: 1px solid #000 !important;
+          padding: 2mm !important;
+          text-align: center !important;
+          font-weight: bold !important;
+          font-size: 9px !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        .items-table td {
+          border: 1px solid #000 !important;
+          padding: 2mm !important;
+          font-size: 8px !important;
+          text-align: center !important;
+          vertical-align: middle !important;
+        }
+
+        .items-table .text-left {
+          text-align: left !important;
+        }
+
+        .total-row {
+          font-weight: bold !important;
+          background-color: #f9f9f9 !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        /* Total amount section */
+        .total-amount {
+          border: 2px solid #000 !important;
+          padding: 4mm !important;
+          text-align: center !important;
+          margin-bottom: 3mm !important;
+          background-color: #f9f9f9 !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        .total-amount h3 {
+          font-size: 16px !important;
+          font-weight: bold !important;
+          margin: 0 !important;
+        }
+
+        /* Amount in words */
+        .amount-words {
+          border: 1px solid #000 !important;
+          padding: 3mm !important;
+          margin-bottom: 3mm !important;
+          font-size: 9px !important;
+          font-weight: bold !important;
+        }
+
+        /* Bottom section - three columns */
+        .bottom-section {
+          display: table !important;
+          width: 100% !important;
+          table-layout: fixed !important;
+        }
+
+        .bottom-column {
+          display: table-cell !important;
+          vertical-align: top !important;
+          border: 1px solid #000 !important;
+          padding: 3mm !important;
+          position: relative !important;
+        }
+
+        .bank-column {
+          width: 40% !important;
+        }
+
+        .terms-column {
+          width: 30% !important;
+        }
+
+        .signature-column {
+          width: 30% !important;
+          text-align: center !important;
+        }
+
+        .bottom-section h5 {
+          font-size: 10px !important;
+          font-weight: bold !important;
+          text-decoration: underline !important;
+          margin-bottom: 2mm !important;
+        }
+
+        .bottom-section p {
+          font-size: 8px !important;
+          margin-bottom: 1mm !important;
+          line-height: 1.2 !important;
+        }
+
+        /* QR code in bank details */
+        .qr-code {
+          position: absolute !important;
+          bottom: 3mm !important;
+          right: 3mm !important;
+          text-align: center !important;
+        }
+
+        .qr-code img {
+          width: 17mm !important;
+          height: 17mm !important;
+          margin-bottom: 4mm !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        .qr-code p {
+          font-size: 6px !important;
+          margin: 0 !important;
+          font-weight: bold !important;
+        }
+
+        /* Signature section */
+        .signature-content {
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          justify-content: center !important;
+          height: 100% !important;
+          gap: 2mm !important;
+        }
+
+        .company-logo-sig {
+          display: flex !important;
+          align-items: center !important;
+          gap: 2mm !important;
+        }
+
+        .company-logo-sig img {
+          width: 8mm !important;
+          height: 6mm !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        .company-name {
+          font-size: 11px !important;
+          font-weight: bold !important;
+        }
+
+        .signature-line {
+          font-size: 8px !important;
+          font-weight: bold !important;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="estimate-container">
+        <!-- Watermark -->
+        <div class="watermark">
+          <img src="/logo.png" alt="Watermark" />
+        </div>
+
+        <div class="content">
+          <!-- Title -->
+          <div class="estimate-title">Estimate</div>
+          
+          <!-- Header Section -->
+          <div class="header-section">
+            <div class="header-row">
+              <div class="company-cell">
+                <div class="company-info">
+                  <img src="/logo.png" alt="Empress PC" class="company-logo" />
+                  <div class="company-details">
+                    <h3>Empress PC</h3>
+                    <p>MS-101, Sector D, Aliganj, Lucknow</p>
+                    <p>Phone no.: 8881123430</p>
+                    <p>Email: sales@empresspc.in</p>
+                    <p>GSTIN: 09AALCD1630P1Z9</p>
+                    <p>State: 09-Uttar Pradesh</p>
+                  </div>
+                </div>
+              </div>
+              <div class="estimate-cell">
+                <div class="estimate-info">
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td class="estimate-label">Estimate No.</td>
+                        <td>${estimateData.estimateNo}</td>
+                      </tr>
+                      <tr>
+                        <td class="estimate-label">Date</td>
+                        <td>${estimateData.date}</td>
+                      </tr>
+                      <tr>
+                        <td class="estimate-label">Place of supply</td>
+                        <td>${estimateData.placeOfSupply}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer Section -->
+          <div class="customer-section">
+            <h4>Estimate For</h4>
+            <p><strong>${estimateData.customer.name}</strong></p>
+            <p>${estimateData.customer.address}</p>
+            <p>Contact No.: ${estimateData.customer.contact}</p>
+            <p>State: ${estimateData.customer.state}</p>
+          </div>
+
+          <!-- Items Table -->
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th style="width: 8%;">S.No.</th>
+                <th style="width: 15%;">Category</th>
+                <th style="width: 15%;">Brand</th>
+                <th style="width: 40%;">Item Name</th>
+                <th style="width: 12%;">Warranty</th>
+                <th style="width: 10%;">Qty</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${estimateData.items.map(item => `
+                <tr>
+                  <td>${item.serial}</td>
+                  <td class="text-left">${item.category}</td>
+                  <td class="text-left">${item.brand}</td>
+                  <td class="text-left">${item.name}</td>
+                  <td>${item.warranty}</td>
+                  <td>${item.quantity}</td>
+                </tr>
+              `).join('')}
+              
+              <tr class="total-row">
+                <td><strong>Total</strong></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><strong>${estimateData.totals.quantity}</strong></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Total Amount -->
+          <div class="total-amount">
+            <h3>Total Amount: ${estimateData.totals.finalTotal}</h3>
+          </div>
+
+          <!-- Amount in Words -->
+          <div class="amount-words">
+            <strong>Estimate Amount in Words:</strong><br />
+            ${estimateData.totals.amountInWords}
+          </div>
+
+          <!-- Bottom Section -->
+          <div class="bottom-section">
+            <!-- Bank Details -->
+            <div class="bottom-column bank-column">
+              <h5>Bank Details</h5>
+              <p><strong>Name:</strong> KOTAK MAHINDRA BANK LIMITED,</p>
+              <p>LUCKNOW AMINABAD BRANCH</p>
+              <p><strong>Account No.:</strong> 8707304202</p>
+              <p><strong>IFSC code:</strong> KKBK0005194</p>
+              <p><strong>Account holder's name:</strong> DIGINEXT PRO SOLUTIONS PRIVATE LIMITED</p>
+              
+              <!-- QR Code -->
+              <div class="qr-code">
+                <img src="/qr.png" alt="QR Code" />
+              </div>
+            </div>
+
+            <!-- Terms and Conditions -->
+            <div class="bottom-column terms-column">
+              <h5>Terms and conditions</h5>
+              <p>1. Quote Is Valid For 7 Days Only!</p>
+            </div>
+
+            <!-- Authorized Signatory -->
+            <div class="bottom-column signature-column">
+              <div class="signature-content">
+                <p style="font-size: 9px; font-weight: bold; margin-bottom: 2mm;">For: Empress PC</p>
+                
+                <div class="company-logo-sig">
+                  <img src="/logo.png" alt="Empress PC" />
+                  <div class="company-name">EMPRESS PC</div>
+                </div>
+                
+                <div class="signature-line">Authorized Signatory</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+};
+
+// Updated PDF generation function
+export const generateQuotationPDF = (quotation) => {
+  return new Promise((resolve, reject) => {
+    try {
+      // Validate quotation data
+      if (!quotation || !quotation.party || !quotation.components) {
+        throw new Error("Invalid quotation data");
+      }
+
+      // Create HTML content
+      const htmlContent = createEstimateHTML(quotation);
+      
+      // Create a temporary div to render HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = htmlContent;
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      tempDiv.style.top = '0';
+      tempDiv.style.width = '210mm';
+      tempDiv.style.height = '297mm';
+      
+      document.body.appendChild(tempDiv);
+
+      // Configure html2canvas options for high quality
+      const options = {
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        canvas: null,
+        foreignObjectRendering: false,
+        imageTimeout: 15000,
+        logging: false,
+        proxy: null,
+        removeContainer: true,
+        scale: 2, // Higher scale for better quality
+        useCORS: true,
+        width: 794, // A4 width in pixels at 96 DPI
+        height: 1123, // A4 height in pixels at 96 DPI
+        scrollX: 0,
+        scrollY: 0
+      };
+
+      // Convert HTML to canvas
+      html2canvas(tempDiv.querySelector('.estimate-container'), options)
+        .then(canvas => {
+          // Clean up temporary div
+          document.body.removeChild(tempDiv);
+
+          // Create PDF
+          const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4',
+            putOnlyUsedFonts: true,
+            floatPrecision: 16
+          });
+
+          // Calculate dimensions to fit A4
+          const imgWidth = 210; // A4 width in mm
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+          // Add image to PDF
+          const imgData = canvas.toDataURL('image/jpeg', 1.0);
+          pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+
+          resolve(pdf);
+        })
+        .catch(error => {
+          // Clean up on error
+          if (tempDiv.parentNode) {
+            document.body.removeChild(tempDiv);
+          }
+          console.error('Error converting HTML to canvas:', error);
+          reject(new Error(`PDF generation failed: ${error.message}`));
+        });
+
+    } catch (error) {
+      console.error('Error in PDF generation:', error);
+      reject(new Error(`PDF generation failed: ${error.message}`));
+    }
+  });
+};
+
+// Keep existing helper functions
 export const formatCurrency = (amount) => {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -413,23 +655,18 @@ export const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-// Helper function to validate quotation data before PDF generation
 export const validateQuotationData = (quotation) => {
   if (!quotation) {
     throw new Error("Quotation data is required");
   }
-
   if (!quotation.party) {
     throw new Error("Party information is required");
   }
-
   if (!quotation.components || quotation.components.length === 0) {
     throw new Error("At least one component is required");
   }
-
   if (!quotation.totalAmount || quotation.totalAmount <= 0) {
     throw new Error("Valid total amount is required");
   }
-
   return true;
 };
