@@ -111,7 +111,7 @@ const getSmartWatermark = (quotation) => {
   ) {
     return {
       primary: "pcie",
-      secondary: ["cooler", "case"],
+      secondary: ["cooler", "case", "monitor", "keyboard", "mouse", "power"],
       color: "#00cc88",
     };
   }
@@ -130,7 +130,7 @@ const getSmartWatermark = (quotation) => {
   ) {
     return {
       primary: "cpu",
-      secondary: ["cooler", "motherboard"],
+      secondary: ["cooler", "motherboard", "ram", "power", "case", "thermal"],
       color: "#0088ff",
     };
   }
@@ -146,7 +146,7 @@ const getSmartWatermark = (quotation) => {
   ) {
     return {
       primary: "ram",
-      secondary: ["motherboard", "cpu"],
+      secondary: ["motherboard", "cpu", "power", "case", "cooler", "cable"],
       color: "#ff6600",
     };
   }
@@ -162,7 +162,7 @@ const getSmartWatermark = (quotation) => {
   ) {
     return {
       primary: "hdd",
-      secondary: ["motherboard", "cable"],
+      secondary: ["motherboard", "cable", "power", "case", "ssd", "cooler"],
       color: "#cc6600",
     };
   }
@@ -170,12 +170,12 @@ const getSmartWatermark = (quotation) => {
   // Default to motherboard for general PC builds
   return {
     primary: "motherboard",
-    secondary: ["cpu", "ram"],
+    secondary: ["cpu", "ram", "power", "case", "cooler", "cable"],
     color: "#ff8c00",
   };
 };
 
-// Generate SVG watermark inline
+// Generate SVG watermark inline - EXPANDED WITH MORE COMPONENTS
 const generateWatermarkSVG = (type) => {
   const svgComponents = {
     ram: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -196,6 +196,11 @@ const generateWatermarkSVG = (type) => {
       <rect x="80" y="85" width="40" height="8" rx="2" fill="currentColor"/>
       <rect x="80" y="100" width="30" height="6" rx="2" fill="currentColor"/>
       <rect x="80" y="110" width="35" height="6" rx="2" fill="currentColor"/>
+      <!-- CPU pins -->
+      <circle cx="60" cy="40" r="2" fill="currentColor"/>
+      <circle cx="80" cy="40" r="2" fill="currentColor"/>
+      <circle cx="120" cy="40" r="2" fill="currentColor"/>
+      <circle cx="140" cy="40" r="2" fill="currentColor"/>
     </svg>`,
 
     pcie: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -204,6 +209,9 @@ const generateWatermarkSVG = (type) => {
       <circle cx="120" cy="100" r="20" fill="none" stroke="currentColor" stroke-width="2"/>
       <circle cx="120" cy="100" r="15" fill="none" stroke="currentColor" stroke-width="1"/>
       <circle cx="120" cy="100" r="5" fill="currentColor"/>
+      <!-- PCIe connectors -->
+      <rect x="35" y="135" width="8" height="15" rx="1" fill="currentColor"/>
+      <rect x="157" y="135" width="8" height="15" rx="1" fill="currentColor"/>
     </svg>`,
 
     motherboard: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -212,6 +220,10 @@ const generateWatermarkSVG = (type) => {
       <rect x="55" y="65" width="30" height="30" rx="2" fill="currentColor" opacity="0.2"/>
       <rect x="100" y="65" width="60" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/>
       <rect x="100" y="78" width="60" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <!-- Capacitors -->
+      <circle cx="45" cy="120" r="3" fill="currentColor"/>
+      <circle cx="45" cy="135" r="3" fill="currentColor"/>
+      <circle cx="155" cy="120" r="3" fill="currentColor"/>
     </svg>`,
 
     hdd: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -219,13 +231,28 @@ const generateWatermarkSVG = (type) => {
       <rect x="55" y="65" width="90" height="35" rx="2" fill="currentColor" opacity="0.2"/>
       <rect x="55" y="105" width="90" height="30" rx="2" fill="currentColor" opacity="0.3"/>
       <rect x="65" y="75" width="50" height="4" rx="1" fill="currentColor"/>
+      <!-- Connection ports -->
+      <rect x="155" y="90" width="8" height="20" rx="1" fill="currentColor"/>
+    </svg>`,
+
+    ssd: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="70" width="80" height="60" rx="3" fill="none" stroke="currentColor" stroke-width="3"/>
+      <rect x="70" y="80" width="60" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+      <rect x="70" y="95" width="25" height="8" rx="1" fill="currentColor"/>
+      <rect x="100" y="95" width="25" height="8" rx="1" fill="currentColor"/>
+      <rect x="70" y="110" width="40" height="8" rx="1" fill="currentColor" opacity="0.3"/>
+      <!-- SSD connector -->
+      <rect x="145" y="95" width="6" height="10" rx="1" fill="currentColor"/>
     </svg>`,
 
     cooler: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
       <rect x="40" y="80" width="120" height="40" rx="4" fill="none" stroke="currentColor" stroke-width="3"/>
-      <circle cx="70" cy="100" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
-      <circle cx="100" cy="100" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
-      <circle cx="130" cy="100" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="70" cy="100" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="100" cy="100" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="130" cy="100" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+      <!-- Fan blades -->
+      <path d="M 70 92 L 78 100 L 70 108 L 62 100 Z" fill="currentColor" opacity="0.3"/>
+      <path d="M 100 92 L 108 100 L 100 108 L 92 100 Z" fill="currentColor" opacity="0.3"/>
     </svg>`,
 
     case: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -233,19 +260,85 @@ const generateWatermarkSVG = (type) => {
       <circle cx="100" cy="50" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
       <circle cx="100" cy="50" r="3" fill="currentColor"/>
       <rect x="70" y="105" width="60" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1"/>
+      <!-- Ventilation grilles -->
+      <rect x="70" y="120" width="60" height="2" rx="1" fill="currentColor" opacity="0.4"/>
+      <rect x="70" y="125" width="60" height="2" rx="1" fill="currentColor" opacity="0.4"/>
+      <rect x="70" y="130" width="60" height="2" rx="1" fill="currentColor" opacity="0.4"/>
     </svg>`,
 
     cable: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
       <path d="M 30 100 Q 70 60 100 100 Q 130 140 170 100" fill="none" stroke="currentColor" stroke-width="6"/>
       <rect x="20" y="95" width="20" height="10" rx="3" fill="currentColor"/>
       <rect x="160" y="95" width="20" height="10" rx="3" fill="currentColor"/>
+      <!-- Cable texture -->
+      <path d="M 40 100 Q 80 70 120 100" fill="none" stroke="currentColor" stroke-width="2" opacity="0.5"/>
+    </svg>`,
+
+    power: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="50" y="60" width="100" height="80" rx="6" fill="none" stroke="currentColor" stroke-width="3"/>
+      <rect x="60" y="70" width="80" height="25" rx="3" fill="currentColor" opacity="0.2"/>
+      <circle cx="100" cy="120" r="15" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="100" cy="120" r="8" fill="currentColor" opacity="0.4"/>
+      <!-- Cooling fan -->
+      <path d="M 100 112 L 108 120 L 100 128 L 92 120 Z" fill="currentColor"/>
+      <!-- Power connectors -->
+      <rect x="155" y="85" width="8" height="30" rx="2" fill="currentColor"/>
+    </svg>`,
+
+    monitor: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="50" width="120" height="80" rx="4" fill="none" stroke="currentColor" stroke-width="3"/>
+      <rect x="45" y="55" width="110" height="70" rx="2" fill="currentColor" opacity="0.1"/>
+      <rect x="90" y="130" width="20" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+      <rect x="70" y="145" width="60" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+      <!-- Screen elements -->
+      <rect x="60" y="70" width="80" height="2" rx="1" fill="currentColor" opacity="0.3"/>
+      <rect x="60" y="85" width="60" height="2" rx="1" fill="currentColor" opacity="0.3"/>
+    </svg>`,
+
+    keyboard: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="80" width="140" height="40" rx="4" fill="none" stroke="currentColor" stroke-width="3"/>
+      <!-- Keys -->
+      <rect x="40" y="90" width="8" height="8" rx="1" fill="currentColor"/>
+      <rect x="52" y="90" width="8" height="8" rx="1" fill="currentColor"/>
+      <rect x="64" y="90" width="8" height="8" rx="1" fill="currentColor"/>
+      <rect x="76" y="90" width="8" height="8" rx="1" fill="currentColor"/>
+      <rect x="40" y="102" width="8" height="8" rx="1" fill="currentColor"/>
+      <rect x="52" y="102" width="8" height="8" rx="1" fill="currentColor"/>
+      <rect x="64" y="102" width="20" height="8" rx="1" fill="currentColor"/>
+      <!-- More keys pattern -->
+      <rect x="100" y="90" width="60" height="8" rx="1" fill="currentColor" opacity="0.3"/>
+    </svg>`,
+
+    mouse: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="100" cy="110" rx="30" ry="45" fill="none" stroke="currentColor" stroke-width="3"/>
+      <ellipse cx="100" cy="105" rx="25" ry="35" fill="currentColor" opacity="0.1"/>
+      <!-- Mouse buttons -->
+      <path d="M 85 80 Q 100 75 115 80 L 115 100 Q 100 95 85 100 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+      <line x1="100" y1="80" x2="100" y2="100" stroke="currentColor" stroke-width="1"/>
+      <!-- Scroll wheel -->
+      <rect x="96" y="82" width="8" height="15" rx="2" fill="currentColor" opacity="0.4"/>
+      <!-- Cable -->
+      <path d="M 100 155 Q 120 170 140 180" fill="none" stroke="currentColor" stroke-width="3"/>
+    </svg>`,
+
+    thermal: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="60" width="80" height="80" rx="4" fill="none" stroke="currentColor" stroke-width="3"/>
+      <!-- Heat pipes -->
+      <rect x="70" y="70" width="4" height="60" rx="2" fill="currentColor"/>
+      <rect x="80" y="70" width="4" height="60" rx="2" fill="currentColor"/>
+      <rect x="90" y="70" width="4" height="60" rx="2" fill="currentColor"/>
+      <rect x="100" y="70" width="4" height="60" rx="2" fill="currentColor"/>
+      <rect x="110" y="70" width="4" height="60" rx="2" fill="currentColor"/>
+      <rect x="120" y="70" width="4" height="60" rx="2" fill="currentColor"/>
+      <!-- Base -->
+      <rect x="65" y="125" width="70" height="10" rx="2" fill="currentColor" opacity="0.3"/>
     </svg>`,
   };
 
   return svgComponents[type] || svgComponents.motherboard;
 };
 
-// Create HTML template with smart watermarks (WITHOUT PRICE)
+// Create HTML template with smart watermarks (WITHOUT PRICE) - INCREASED TEXT SIZES
 const createEstimateHTML = (quotation) => {
   // Format quotation data
   const estimateData = {
@@ -285,12 +378,7 @@ const createEstimateHTML = (quotation) => {
   // Get smart watermark for this quotation
   const watermarkConfig = getSmartWatermark(quotation);
   const primaryWatermarkSVG = generateWatermarkSVG(watermarkConfig.primary);
-  const secondaryWatermark1 = generateWatermarkSVG(
-    watermarkConfig.secondary[0]
-  );
-  const secondaryWatermark2 = generateWatermarkSVG(
-    watermarkConfig.secondary[1]
-  );
+  const watermarkSVGs = watermarkConfig.secondary.map(type => generateWatermarkSVG(type));
 
   return `
     <!DOCTYPE html>
@@ -310,8 +398,8 @@ const createEstimateHTML = (quotation) => {
           margin: 0 !important;
           padding: 8mm 6mm !important;
           font-family: Arial, sans-serif !important;
-          font-size: 10px !important;
-          line-height: 1.2 !important;
+          font-size: 12px !important;
+          line-height: 1.3 !important;
           color: #000 !important;
           background: white !important;
           -webkit-print-color-adjust: exact !important;
@@ -321,7 +409,7 @@ const createEstimateHTML = (quotation) => {
         .estimate-container {
           width: 100% !important;
           height: 100% !important;
-          padding: 3mm !important;
+          padding: 8mm !important;
           position: relative !important;
         }
 
@@ -333,7 +421,7 @@ const createEstimateHTML = (quotation) => {
           transform: translate(-25%, -25%) rotate(0deg) !important;
           width: 170mm !important;
           height: 170mm !important;
-          opacity: 0.1 !important;
+          opacity: 0.08 !important;
           z-index: 1 !important;
           pointer-events: none !important;
         }
@@ -345,39 +433,69 @@ const createEstimateHTML = (quotation) => {
           print-color-adjust: exact !important;
         }
 
-        /* Component watermarks */
+        /* Component watermarks - 8 total positions */
         .watermark {
           position: absolute !important;
-          opacity: 0.06 !important;
+          opacity: 0.05 !important;
           z-index: 1 !important;
           pointer-events: none !important;
           color: ${watermarkConfig.color} !important;
         }
 
         .watermark-1 {
-          top: 25% !important;
-          left: 20% !important;
+          top: 15% !important;
+          left: 15% !important;
           transform: translate(-50%, -50%) rotate(-35deg) !important;
-          width: 80mm !important;
-          height: 80mm !important;
+          width: 70mm !important;
+          height: 70mm !important;
         }
 
         .watermark-2 {
-          top: 75% !important;
-          left: 80% !important;
+          top: 25% !important;
+          left: 85% !important;
           transform: translate(-50%, -50%) rotate(25deg) !important;
-          width: 60mm !important;
-          height: 60mm !important;
-          opacity: 0.06 !important;
+          width: 55mm !important;
+          height: 55mm !important;
         }
 
         .watermark-3 {
-          top: 40% !important;
-          left: 80% !important;
+          top: 45% !important;
+          left: 10% !important;
           transform: translate(-50%, -50%) rotate(-65deg) !important;
+          width: 45mm !important;
+          height: 45mm !important;
+        }
+
+        .watermark-4 {
+          top: 65% !important;
+          left: 90% !important;
+          transform: translate(-50%, -50%) rotate(45deg) !important;
+          width: 40mm !important;
+          height: 40mm !important;
+        }
+
+        .watermark-5 {
+          top: 85% !important;
+          left: 20% !important;
+          transform: translate(-50%, -50%) rotate(-15deg) !important;
           width: 50mm !important;
           height: 50mm !important;
-          opacity: 0.06 !important;
+        }
+
+        .watermark-6 {
+          top: 35% !important;
+          left: 50% !important;
+          transform: translate(-50%, -50%) rotate(75deg) !important;
+          width: 35mm !important;
+          height: 35mm !important;
+        }
+
+        .watermark-7 {
+          top: 75% !important;
+          left: 60% !important;
+          transform: translate(-50%, -50%) rotate(-85deg) !important;
+          width: 38mm !important;
+          height: 38mm !important;
         }
 
         .watermark svg {
@@ -392,10 +510,10 @@ const createEstimateHTML = (quotation) => {
           height: 100% !important;
         }
 
-        /* Title */
+        /* Title - INCREASED SIZE */
         .estimate-title {
           text-align: center !important;
-          font-size: 18px !important;
+          font-size: 22px !important;
           font-weight: bold !important;
           margin-bottom: 4mm !important;
           text-decoration: underline !important;
@@ -435,23 +553,23 @@ const createEstimateHTML = (quotation) => {
         }
 
         .company-logo {
-          width: 12mm !important;
-          height: 12mm !important;
+          width: 14mm !important;
+          height: 14mm !important;
           flex-shrink: 0 !important;
           -webkit-print-color-adjust: exact !important;
           print-color-adjust: exact !important;
         }
 
         .company-details h3 {
-          font-size: 14px !important;
+          font-size: 16px !important;
           font-weight: bold !important;
           margin-bottom: 1mm !important;
         }
 
         .company-details p {
-          font-size: 9px !important;
+          font-size: 11px !important;
           margin-bottom: 0.5mm !important;
-          line-height: 1.2 !important;
+          line-height: 1.3 !important;
         }
 
         .estimate-info table {
@@ -462,7 +580,7 @@ const createEstimateHTML = (quotation) => {
         .estimate-info td {
           border: 1px solid #000 !important;
           padding: 2mm !important;
-          font-size: 9px !important;
+          font-size: 11px !important;
           vertical-align: middle !important;
         }
 
@@ -474,7 +592,7 @@ const createEstimateHTML = (quotation) => {
           print-color-adjust: exact !important;
         }
 
-        /* Customer section */
+        /* Customer section - INCREASED SIZE */
         .customer-section {
           border: 1px solid #000 !important;
           padding: 3mm !important;
@@ -482,19 +600,19 @@ const createEstimateHTML = (quotation) => {
         }
 
         .customer-section h4 {
-          font-size: 10px !important;
+          font-size: 12px !important;
           font-weight: bold !important;
           text-decoration: underline !important;
           margin-bottom: 2mm !important;
         }
 
         .customer-section p {
-          font-size: 9px !important;
+          font-size: 11px !important;
           margin-bottom: 1mm !important;
-          line-height: 1.2 !important;
+          line-height: 1.3 !important;
         }
 
-        /* Items table */
+        /* Items table - INCREASED SIZE */
         .items-table {
           width: 100% !important;
           border: 2px solid #000 !important;
@@ -508,7 +626,7 @@ const createEstimateHTML = (quotation) => {
           padding: 2mm !important;
           text-align: center !important;
           font-weight: bold !important;
-          font-size: 9px !important;
+          font-size: 11px !important;
           -webkit-print-color-adjust: exact !important;
           print-color-adjust: exact !important;
         }
@@ -516,7 +634,7 @@ const createEstimateHTML = (quotation) => {
         .items-table td {
           border: 1px solid #000 !important;
           padding: 2mm !important;
-          font-size: 8px !important;
+          font-size: 10px !important;
           text-align: center !important;
           vertical-align: middle !important;
         }
@@ -532,7 +650,7 @@ const createEstimateHTML = (quotation) => {
           print-color-adjust: exact !important;
         }
 
-        /* Combined total amount section */
+        /* Combined total amount section - INCREASED SIZE */
         .total-amount-section {
           border: 2px solid #000 !important;
           margin-bottom: 3mm !important;
@@ -564,24 +682,24 @@ const createEstimateHTML = (quotation) => {
         }
 
         .amount-words-label {
-          font-size: 10px !important;
+          font-size: 12px !important;
           font-weight: bold !important;
           margin-bottom: 2mm !important;
         }
 
         .amount-words-text {
-          font-size: 9px !important;
+          font-size: 11px !important;
           font-weight: bold !important;
-          line-height: 1.3 !important;
+          line-height: 1.4 !important;
         }
 
         .total-amount-value {
-          font-size: 16px !important;
+          font-size: 18px !important;
           font-weight: bold !important;
           margin: 0 !important;
         }
 
-        /* Bottom section - three columns */
+        /* Bottom section - three columns - INCREASED SIZE */
         .bottom-section {
           display: table !important;
           width: 100% !important;
@@ -610,41 +728,41 @@ const createEstimateHTML = (quotation) => {
         }
 
         .bottom-section h5 {
-          font-size: 10px !important;
+          font-size: 12px !important;
           font-weight: bold !important;
           text-decoration: underline !important;
           margin-bottom: 2mm !important;
         }
 
         .bottom-section p {
-          font-size: 8px !important;
+          font-size: 10px !important;
           margin-bottom: 1mm !important;
-          line-height: 1.2 !important;
+          line-height: 1.3 !important;
         }
 
         /* QR code in bank details */
         .qr-code {
           position: absolute !important;
-          bottom: 3mm !important;
-          right: 3mm !important;
+          bottom: 6mm !important;
+          right: 6mm !important;
           text-align: center !important;
         }
 
         .qr-code img {
-          width: 8mm !important;
-          height: 8mm !important;
+          width: 15mm !important;
+          height: 15mm !important;
           margin-bottom: 1mm !important;
           -webkit-print-color-adjust: exact !important;
           print-color-adjust: exact !important;
         }
 
         .qr-code p {
-          font-size: 6px !important;
+          font-size: 7px !important;
           margin: 0 !important;
           font-weight: bold !important;
         }
 
-        /* Signature section */
+        /* Signature section - INCREASED SIZE */
         .signature-content {
           display: flex !important;
           flex-direction: column !important;
@@ -661,19 +779,19 @@ const createEstimateHTML = (quotation) => {
         }
 
         .company-logo-sig img {
-          width: 8mm !important;
-          height: 6mm !important;
+          width: 10mm !important;
+          height: 8mm !important;
           -webkit-print-color-adjust: exact !important;
           print-color-adjust: exact !important;
         }
 
         .company-name {
-          font-size: 11px !important;
+          font-size: 13px !important;
           font-weight: bold !important;
         }
 
         .signature-line {
-          font-size: 8px !important;
+          font-size: 10px !important;
           font-weight: bold !important;
         }
       </style>
@@ -685,15 +803,27 @@ const createEstimateHTML = (quotation) => {
           <img src="/logo.png" alt="Company Logo Watermark" />
         </div>
 
-        <!-- Smart Component Watermarks -->
+        <!-- Smart Component Watermarks - 7 positions -->
         <div class="watermark watermark-1">
           ${primaryWatermarkSVG}
         </div>
         <div class="watermark watermark-2">
-          ${secondaryWatermark1}
+          ${watermarkSVGs[0]}
         </div>
         <div class="watermark watermark-3">
-          ${secondaryWatermark2}
+          ${watermarkSVGs[1]}
+        </div>
+        <div class="watermark watermark-4">
+          ${watermarkSVGs[2]}
+        </div>
+        <div class="watermark watermark-5">
+          ${watermarkSVGs[3]}
+        </div>
+        <div class="watermark watermark-6">
+          ${watermarkSVGs[4]}
+        </div>
+        <div class="watermark watermark-7">
+          ${watermarkSVGs[5]}
         </div>
 
         <div class="content">
@@ -805,7 +935,8 @@ const createEstimateHTML = (quotation) => {
             <!-- Bank Details -->
             <div class="bottom-column bank-column">
               <h5>Bank Details</h5>
-              <p><strong>Name:</strong> KOTAK MAHINDRA BANK LIMITED, LUCKNOW AMINABAD BRANCH</p>
+              <p><strong>Name:</strong> KOTAK MAHINDRA BANK LIMITED, LUCKNOW</p>
+              <p>AMINABAD BRANCH</p>
               <p><strong>Account No.:</strong> 8707304202</p>
               <p><strong>IFSC code:</strong> KKBK0005194</p>
               <p><strong>Account holder's name:</strong> DIGINEXT PRO SOLUTIONS PRIVATE LIMITED</p>
@@ -813,7 +944,6 @@ const createEstimateHTML = (quotation) => {
               <!-- QR Code -->
               <div class="qr-code">
                 <img src="/qr.png" alt="QR Code" />
-                <p>Pay</p>
               </div>
             </div>
 
@@ -821,12 +951,13 @@ const createEstimateHTML = (quotation) => {
             <div class="bottom-column terms-column">
               <h5>Terms and conditions</h5>
               <p>1. Quote Is Valid For 7 Days Only!</p>
+              <p>2. Any advance Received Against An Estimate Is Non Refundable Under Any Circumstances.</p>
             </div>
 
             <!-- Authorized Signatory -->
             <div class="bottom-column signature-column">
               <div class="signature-content">
-                <p style="font-size: 9px; font-weight: bold; margin-bottom: 2mm;">For: Empress PC</p>
+                <p style="font-size: 11px; font-weight: bold; margin-bottom: 2mm;">For: Empress PC</p>
                 
                 <div class="company-logo-sig">
                   <img src="/logo.png" alt="Empress PC" />
@@ -844,7 +975,7 @@ const createEstimateHTML = (quotation) => {
   `;
 };
 
-// Create HTML template WITH PRICE (NEW FUNCTION)
+// Create HTML template WITH PRICE (NEW FUNCTION) - INCREASED TEXT SIZES
 const createEstimateWithPriceHTML = (quotation) => {
   // Format quotation data with prices
   const estimateData = {
@@ -886,12 +1017,7 @@ const createEstimateWithPriceHTML = (quotation) => {
   // Get smart watermark for this quotation
   const watermarkConfig = getSmartWatermark(quotation);
   const primaryWatermarkSVG = generateWatermarkSVG(watermarkConfig.primary);
-  const secondaryWatermark1 = generateWatermarkSVG(
-    watermarkConfig.secondary[0]
-  );
-  const secondaryWatermark2 = generateWatermarkSVG(
-    watermarkConfig.secondary[1]
-  );
+  const watermarkSVGs = watermarkConfig.secondary.map(type => generateWatermarkSVG(type));
 
   return `
     <!DOCTYPE html>
@@ -911,8 +1037,8 @@ const createEstimateWithPriceHTML = (quotation) => {
           margin: 0 !important;
           padding: 8mm 6mm !important;
           font-family: Arial, sans-serif !important;
-          font-size: 10px !important;
-          line-height: 1.2 !important;
+          font-size: 12px !important;
+          line-height: 1.3 !important;
           color: #000 !important;
           background: white !important;
           -webkit-print-color-adjust: exact !important;
@@ -934,7 +1060,7 @@ const createEstimateWithPriceHTML = (quotation) => {
           transform: translate(-25%, -25%) rotate(0deg) !important;
           width: 170mm !important;
           height: 170mm !important;
-          opacity: 0.1 !important;
+          opacity: 0.08 !important;
           z-index: 1 !important;
           pointer-events: none !important;
         }
@@ -946,39 +1072,69 @@ const createEstimateWithPriceHTML = (quotation) => {
           print-color-adjust: exact !important;
         }
 
-        /* Component watermarks */
+        /* Component watermarks - 7 positions */
         .watermark {
           position: absolute !important;
-          opacity: 0.06 !important;
+          opacity: 0.05 !important;
           z-index: 1 !important;
           pointer-events: none !important;
           color: ${watermarkConfig.color} !important;
         }
 
         .watermark-1 {
-          top: 25% !important;
-          left: 20% !important;
+          top: 15% !important;
+          left: 15% !important;
           transform: translate(-50%, -50%) rotate(-35deg) !important;
-          width: 80mm !important;
-          height: 80mm !important;
+          width: 70mm !important;
+          height: 70mm !important;
         }
 
         .watermark-2 {
-          top: 75% !important;
-          left: 80% !important;
+          top: 25% !important;
+          left: 85% !important;
           transform: translate(-50%, -50%) rotate(25deg) !important;
-          width: 60mm !important;
-          height: 60mm !important;
-          opacity: 0.06 !important;
+          width: 55mm !important;
+          height: 55mm !important;
         }
 
         .watermark-3 {
-          top: 40% !important;
-          left: 80% !important;
+          top: 45% !important;
+          left: 10% !important;
           transform: translate(-50%, -50%) rotate(-65deg) !important;
+          width: 45mm !important;
+          height: 45mm !important;
+        }
+
+        .watermark-4 {
+          top: 65% !important;
+          left: 90% !important;
+          transform: translate(-50%, -50%) rotate(45deg) !important;
+          width: 40mm !important;
+          height: 40mm !important;
+        }
+
+        .watermark-5 {
+          top: 85% !important;
+          left: 20% !important;
+          transform: translate(-50%, -50%) rotate(-15deg) !important;
           width: 50mm !important;
           height: 50mm !important;
-          opacity: 0.06 !important;
+        }
+
+        .watermark-6 {
+          top: 35% !important;
+          left: 50% !important;
+          transform: translate(-50%, -50%) rotate(75deg) !important;
+          width: 35mm !important;
+          height: 35mm !important;
+        }
+
+        .watermark-7 {
+          top: 75% !important;
+          left: 60% !important;
+          transform: translate(-50%, -50%) rotate(-85deg) !important;
+          width: 38mm !important;
+          height: 38mm !important;
         }
 
         .watermark svg {
@@ -993,10 +1149,10 @@ const createEstimateWithPriceHTML = (quotation) => {
           height: 100% !important;
         }
 
-        /* Title */
+        /* Title - INCREASED SIZE */
         .estimate-title {
           text-align: center !important;
-          font-size: 18px !important;
+          font-size: 22px !important;
           font-weight: bold !important;
           margin-bottom: 4mm !important;
           text-decoration: underline !important;
@@ -1036,23 +1192,23 @@ const createEstimateWithPriceHTML = (quotation) => {
         }
 
         .company-logo {
-          width: 12mm !important;
-          height: 12mm !important;
+          width: 14mm !important;
+          height: 14mm !important;
           flex-shrink: 0 !important;
           -webkit-print-color-adjust: exact !important;
           print-color-adjust: exact !important;
         }
 
         .company-details h3 {
-          font-size: 14px !important;
+          font-size: 16px !important;
           font-weight: bold !important;
           margin-bottom: 1mm !important;
         }
 
         .company-details p {
-          font-size: 9px !important;
+          font-size: 13px !important;
           margin-bottom: 0.5mm !important;
-          line-height: 1.2 !important;
+          line-height: 1.3 !important;
         }
 
         .estimate-info table {
@@ -1063,7 +1219,7 @@ const createEstimateWithPriceHTML = (quotation) => {
         .estimate-info td {
           border: 1px solid #000 !important;
           padding: 2mm !important;
-          font-size: 9px !important;
+          font-size: 12px !important;
           vertical-align: middle !important;
         }
 
@@ -1075,7 +1231,7 @@ const createEstimateWithPriceHTML = (quotation) => {
           print-color-adjust: exact !important;
         }
 
-        /* Customer section */
+        /* Customer section - INCREASED SIZE */
         .customer-section {
           border: 1px solid #000 !important;
           padding: 3mm !important;
@@ -1083,19 +1239,19 @@ const createEstimateWithPriceHTML = (quotation) => {
         }
 
         .customer-section h4 {
-          font-size: 10px !important;
+          font-size: 14px !important;
           font-weight: bold !important;
           text-decoration: underline !important;
           margin-bottom: 2mm !important;
         }
 
         .customer-section p {
-          font-size: 9px !important;
+          font-size: 13px !important;
           margin-bottom: 1mm !important;
-          line-height: 1.2 !important;
+          line-height: 1.3 !important;
         }
 
-        /* Items table WITH PRICE */
+        /* Items table WITH PRICE - INCREASED SIZE */
         .items-table {
           width: 100% !important;
           border: 2px solid #000 !important;
@@ -1109,7 +1265,7 @@ const createEstimateWithPriceHTML = (quotation) => {
           padding: 2mm !important;
           text-align: center !important;
           font-weight: bold !important;
-          font-size: 9px !important;
+          font-size: 12px !important;
           -webkit-print-color-adjust: exact !important;
           print-color-adjust: exact !important;
         }
@@ -1117,7 +1273,7 @@ const createEstimateWithPriceHTML = (quotation) => {
         .items-table td {
           border: 1px solid #000 !important;
           padding: 2mm !important;
-          font-size: 8px !important;
+          font-size: 10px !important;
           text-align: center !important;
           vertical-align: middle !important;
         }
@@ -1137,7 +1293,7 @@ const createEstimateWithPriceHTML = (quotation) => {
           print-color-adjust: exact !important;
         }
 
-        /* Combined total amount section */
+        /* Combined total amount section - INCREASED SIZE */
         .total-amount-section {
           border: 2px solid #000 !important;
           margin-bottom: 3mm !important;
@@ -1169,24 +1325,24 @@ const createEstimateWithPriceHTML = (quotation) => {
         }
 
         .amount-words-label {
-          font-size: 10px !important;
+          font-size: 12px !important;
           font-weight: bold !important;
           margin-bottom: 2mm !important;
         }
 
         .amount-words-text {
-          font-size: 9px !important;
+          font-size: 11px !important;
           font-weight: bold !important;
-          line-height: 1.3 !important;
+          line-height: 1.4 !important;
         }
 
         .total-amount-value {
-          font-size: 16px !important;
+          font-size: 18px !important;
           font-weight: bold !important;
           margin: 0 !important;
         }
 
-        /* Bottom section - three columns */
+        /* Bottom section - three columns - INCREASED SIZE */
         .bottom-section {
           display: table !important;
           width: 100% !important;
@@ -1215,41 +1371,41 @@ const createEstimateWithPriceHTML = (quotation) => {
         }
 
         .bottom-section h5 {
-          font-size: 10px !important;
+          font-size: 12px !important;
           font-weight: bold !important;
           text-decoration: underline !important;
           margin-bottom: 2mm !important;
         }
 
         .bottom-section p {
-          font-size: 8px !important;
+          font-size: 10px !important;
           margin-bottom: 1mm !important;
-          line-height: 1.2 !important;
+          line-height: 1.3 !important;
         }
 
         /* QR code in bank details */
         .qr-code {
           position: absolute !important;
-          bottom: 3mm !important;
-          right: 3mm !important;
+          bottom: 6mm !important;
+          right: 5mm !important;
           text-align: center !important;
         }
 
         .qr-code img {
-          width: 8mm !important;
-          height: 8mm !important;
+          width: 14mm !important;
+          height: 14mm !important;
           margin-bottom: 1mm !important;
           -webkit-print-color-adjust: exact !important;
           print-color-adjust: exact !important;
         }
 
         .qr-code p {
-          font-size: 6px !important;
+          font-size: 7px !important;
           margin: 0 !important;
           font-weight: bold !important;
         }
 
-        /* Signature section */
+        /* Signature section - INCREASED SIZE */
         .signature-content {
           display: flex !important;
           flex-direction: column !important;
@@ -1266,19 +1422,19 @@ const createEstimateWithPriceHTML = (quotation) => {
         }
 
         .company-logo-sig img {
-          width: 8mm !important;
-          height: 6mm !important;
+          width: 10mm !important;
+          height: 8mm !important;
           -webkit-print-color-adjust: exact !important;
           print-color-adjust: exact !important;
         }
 
         .company-name {
-          font-size: 11px !important;
+          font-size: 13px !important;
           font-weight: bold !important;
         }
 
         .signature-line {
-          font-size: 8px !important;
+          font-size: 10px !important;
           font-weight: bold !important;
         }
       </style>
@@ -1290,15 +1446,27 @@ const createEstimateWithPriceHTML = (quotation) => {
           <img src="/logo.png" alt="Company Logo Watermark" />
         </div>
 
-        <!-- Smart Component Watermarks -->
+        <!-- Smart Component Watermarks - 7 positions -->
         <div class="watermark watermark-1">
           ${primaryWatermarkSVG}
         </div>
         <div class="watermark watermark-2">
-          ${secondaryWatermark1}
+          ${watermarkSVGs[0]}
         </div>
         <div class="watermark watermark-3">
-          ${secondaryWatermark2}
+          ${watermarkSVGs[1]}
+        </div>
+        <div class="watermark watermark-4">
+          ${watermarkSVGs[2]}
+        </div>
+        <div class="watermark watermark-5">
+          ${watermarkSVGs[3]}
+        </div>
+        <div class="watermark watermark-6">
+          ${watermarkSVGs[4]}
+        </div>
+        <div class="watermark watermark-7">
+          ${watermarkSVGs[5]}
         </div>
 
         <div class="content">
@@ -1413,7 +1581,8 @@ const createEstimateWithPriceHTML = (quotation) => {
             <!-- Bank Details -->
             <div class="bottom-column bank-column">
               <h5>Bank Details</h5>
-              <p><strong>Name:</strong> KOTAK MAHINDRA BANK LIMITED, LUCKNOW AMINABAD BRANCH</p>
+              <p><strong>Name:</strong> KOTAK MAHINDRA BANK LIMITED, LUCKNOW</p>
+              <p>AMINABAD BRANCH</p>
               <p><strong>Account No.:</strong> 8707304202</p>
               <p><strong>IFSC code:</strong> KKBK0005194</p>
               <p><strong>Account holder's name:</strong> DIGINEXT PRO SOLUTIONS PRIVATE LIMITED</p>
@@ -1421,7 +1590,6 @@ const createEstimateWithPriceHTML = (quotation) => {
               <!-- QR Code -->
               <div class="qr-code">
                 <img src="/qr.png" alt="QR Code" />
-                <p>Pay</p>
               </div>
             </div>
 
@@ -1429,12 +1597,13 @@ const createEstimateWithPriceHTML = (quotation) => {
             <div class="bottom-column terms-column">
               <h5>Terms and conditions</h5>
               <p>1. Quote Is Valid For 7 Days Only!</p>
+              <p>2. Any advance Received Against An Estimate Is Non Refundable Under Any Circumstances.</p>
             </div>
 
             <!-- Authorized Signatory -->
             <div class="bottom-column signature-column">
               <div class="signature-content">
-                <p style="font-size: 9px; font-weight: bold; margin-bottom: 2mm;">For: Empress PC</p>
+                <p style="font-size: 11px; font-weight: bold; margin-bottom: 2mm;">For: Empress PC</p>
                 
                 <div class="company-logo-sig">
                   <img src="/logo.png" alt="Empress PC" />

@@ -6,7 +6,7 @@ import {
   InputGroup, Badge
 } from 'react-bootstrap';
 import { quotationService, partyService } from '../../services/api';
-import SearchBar from '../ComponentSelector/SearchBar';
+import ComponentSearchBar from '../ComponentSelector/ComponentSearchBar';
 
 const QuotationForm = () => {
   const { id, partyId, reviseId } = useParams();
@@ -128,19 +128,25 @@ const QuotationForm = () => {
     }));
   };
 
-  const handleAddComponent = (model) => {
-    const purchaseWithGst = Number(model.purchasePrice) || 0;
-    const salesWithGst = Number(model.salesPrice) || 0;
+  const handleAddComponent = (selectedComponent) => {
+    // Ensure we're working with the correct data structure
+    const component = selectedComponent.model || selectedComponent;
+    
+    const purchaseWithGst = Number(component.purchasePrice || component.salesPrice || 0);
+    const salesWithGst = Number(component.salesPrice || component.purchasePrice || 0);
     const purchaseWithoutGst = Number((purchaseWithGst / 1.18).toFixed(2));
     const salesWithoutGst = Number((salesWithGst / 1.18).toFixed(2));
 
     const newComponent = {
       tempId: Date.now().toString(),
-      model,
-      category: model.category,
-      brand: model.brand,
-      hsn: model.hsn,
-      warranty: model.warranty,
+      model: {
+        _id: component._id,
+        name: component.name || 'Component'
+      },
+      category: selectedComponent.category || component.category || { name: 'Unknown' },
+      brand: selectedComponent.brand || component.brand || { name: 'Unknown' },
+      hsn: component.hsn || '',
+      warranty: component.warranty || '1 Year',
       quantity: 1,
       purchaseWithoutGst: purchaseWithoutGst,
       purchaseWithGst: purchaseWithGst,
@@ -334,7 +340,11 @@ const QuotationForm = () => {
             <h5>Components</h5>
           </Card.Header>
           <Card.Body>
-            <SearchBar onSelect={handleAddComponent} />
+            {/* Use the dedicated ComponentSearchBar */}
+            <ComponentSearchBar 
+              onSelect={handleAddComponent}
+              placeholder="Search components by name, category, brand, HSN code..."
+            />
 
             {components.length > 0 ? (
               <Table responsive striped bordered className="mt-3">
@@ -358,7 +368,7 @@ const QuotationForm = () => {
                       <td>
                         <div><strong>{component.model.name || 'Component'}</strong></div>
                         <div className="text-muted small">
-                          {component.category.name} | {component.brand.name}
+                          {component.category?.name} | {component.brand?.name}
                         </div>
                       </td>
                       <td>

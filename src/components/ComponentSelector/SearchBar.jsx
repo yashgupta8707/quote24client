@@ -1,329 +1,339 @@
-// client/src/components/ComponentSelector/SearchBar.js
-import React, { useState, useEffect } from 'react';
-import { Form, ListGroup, Button, Modal } from 'react-bootstrap';
-import { modelService, categoryService, brandService } from '../../services/api';
+// client/src/components/SearchBar/SearchBar.jsx - Universal Search Component
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Form, 
+  InputGroup, 
+  Button, 
+  Dropdown, 
+  ListGroup, 
+  Spinner,
+  Badge 
+} from 'react-bootstrap';
+import { 
+  partyService, 
+  quotationService, 
+  componentService,
+  brandService,
+  productService,
+} from '../../services/api';
 
-const SearchBar = ({ onSelect }) => {
+const SearchBar = ({ 
+  onSelect, 
+  placeholder = "Search clients, quotations, products...",
+  searchTypes = ['parties', 'quotations', 'components'],
+  autoFocus = false,
+  className = "",
+  size = "md"
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [brands, setBrands] = useState([]);
-  
-  const [newModel, setNewModel] = useState({
-    name: '',
-    category: '',
-    brand: '',
-    hsn: '',
-    warranty: '',
-    purchasePrice: '',
-    salesPrice: '',
-    gstRate: '18'
-  });
+  const [showResults, setShowResults] = useState(false);
+  const [selectedType, setSelectedType] = useState('all');
+  const searchRef = useRef(null);
+  const resultsRef = useRef(null);
 
-  // Fetch categories and brands
+  // Debounced search effect
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [categoriesRes, brandsRes] = await Promise.all([
-          categoryService.getAll(),
-          brandService.getAll()
-        ]);
-        setCategories(categoriesRes.data);
-        setBrands(brandsRes.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
+    if (searchTerm.length < 2) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      performSearch(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, selectedType]);
+
+  // Click outside to close results
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        searchRef.current && 
+        !searchRef.current.contains(event.target) &&
+        resultsRef.current && 
+        !resultsRef.current.contains(event.target)
+      ) {
+        setShowResults(false);
       }
     };
 
-    fetchData();
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Search for models as user types
-  useEffect(() => {
-    const search = async () => {
-      if (searchTerm.length < 2) {
-        setSearchResults([]);
-        return;
+  const performSearch = async (query) => {
+    if (!query.trim()) return;
+
+    setLoading(true);
+    const results = [];
+
+    try {
+      // Search parties/clients
+      if (selectedType === 'all' || selectedType === 'parties') {
+        if (searchTypes.includes('parties')) {
+          try {
+            const partiesResponse = await partyService.search({ search: query });
+            const parties = partiesResponse.data?.parties || partiesResponse.data || [];
+            parties.slice(0, 5).forEach(party => {
+              results.push({
+                id: party._id,
+                type: 'party',
+                title: party.name,
+                subtitle: `${party.partyId} • ${party.phone}`,
+                icon: '👤',
+                data: party
+              });
+            });
+          } catch (error) {
+            console.warn('Party search failed:', error.message);
+          }
+        }
       }
 
-      setLoading(true);
-      try {
-        const response = await modelService.search(searchTerm);
-        setSearchResults(response.data);
-      } catch (error) {
-        console.error('Error searching models:', error);
+      // Search quotations
+      if (selectedType === 'all' || selectedType === 'quotations') {
+        if (searchTypes.includes('quotations')) {
+          try {
+            const quotationsResponse = await quotationService.getAll();
+            const quotations = quotationsResponse.data || [];
+            const filteredQuotations = quotations.filter(q => 
+              q.title?.toLowerCase().includes(query.toLowerCase()) ||
+              q.party?.name?.toLowerCase().includes(query.toLowerCase())
+            );
+            filteredQuotations.slice(0, 5).forEach(quotation => {
+              results.push({
+                id: quotation._id,
+                type: 'quotation',
+                title: quotation.title || `Quote #${quotation._id.slice(-6)}`,
+                subtitle: `${quotation.party?.name || 'Unknown Client'} • ₹${quotation.totalAmount?.toLocaleString()}`,
+                icon: '📄',
+                data: quotation
+              });
+            });
+          } catch (error) {
+            console.warn('Quotation search failed:', error.message);
+          }
+        }
       }
+
+      // Search components/products
+      if (selectedType === 'all' || selectedType === 'components') {
+        if (searchTypes.includes('components')) {
+          try {
+            const componentsResponse = await componentService.search(query);
+            const components = componentsResponse.data || [];
+            components.slice(0, 5).forEach(component => {
+              results.push({
+                id: component._id,
+                type: 'component',
+                title: component.name || component.title,
+                subtitle: `${component.category || 'Component'} • ₹${component.price?.toLocaleString() || 'N/A'}`,
+                icon: '🔧',
+                data: component
+              });
+            });
+          } catch (error) {
+            console.warn('Component search failed:', error.message);
+          }
+        }
+      }
+
+      // Search brands
+      if (selectedType === 'all' || selectedType === 'brands') {
+        if (searchTypes.includes('brands')) {
+          try {
+            const brandsResponse = await brandService.search(query);
+            const brands = brandsResponse.data || [];
+            brands.slice(0, 5).forEach(brand => {
+              results.push({
+                id: brand._id,
+                type: 'brand',
+                title: brand.name,
+                subtitle: brand.description || 'Brand',
+                icon: '🏷️',
+                data: brand
+              });
+            });
+          } catch (error) {
+            console.warn('Brand search failed:', error.message);
+          }
+        }
+      }
+
+      // Search products
+      if (selectedType === 'all' || selectedType === 'products') {
+        if (searchTypes.includes('products')) {
+          try {
+            const productsResponse = await productService.search(query);
+            const products = productsResponse.data || [];
+            products.slice(0, 5).forEach(product => {
+              results.push({
+                id: product._id,
+                type: 'product',
+                title: product.name,
+                subtitle: `${product.brand?.name || 'Product'} • ₹${product.price?.toLocaleString() || 'N/A'}`,
+                icon: '📦',
+                data: product
+              });
+            });
+          } catch (error) {
+            console.warn('Product search failed:', error.message);
+          }
+        }
+      }
+
+      setSearchResults(results);
+      setShowResults(results.length > 0);
+
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
       setLoading(false);
-    };
+    }
+  };
 
-    const debounce = setTimeout(() => {
-      search();
-    }, 500);
-
-    return () => clearTimeout(debounce);
-  }, [searchTerm]);
-
-  const handleSelect = (model) => {
-    onSelect(model);
+  const handleSelect = (result) => {
+    setShowResults(false);
     setSearchTerm('');
-    setSearchResults([]);
-  };
-
-  const handleCreateNewClick = () => {
-    setNewModel({
-      ...newModel,
-      name: searchTerm
-    });
-    setShowCreateModal(true);
-  };
-
-  const handleNewModelChange = (e) => {
-    const { name, value } = e.target;
-    setNewModel(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleNewModelSubmit = async (e) => {
-    e.preventDefault();
-    
-    try {
-      // Convert string values to numbers
-      const formattedModel = {
-        ...newModel,
-        purchasePrice: parseFloat(newModel.purchasePrice),
-        salesPrice: parseFloat(newModel.salesPrice),
-        gstRate: parseFloat(newModel.gstRate)
-      };
-      
-      const response = await modelService.create(formattedModel);
-      onSelect(response.data);
-      setShowCreateModal(false);
-      setSearchTerm('');
-    } catch (error) {
-      console.error('Error creating new model:', error);
+    if (onSelect) {
+      onSelect(result);
     }
   };
 
-  const handleCreateNewCategory = async () => {
-    const categoryName = prompt('Enter new category name:');
-    if (!categoryName) return;
-    
-    try {
-      const response = await categoryService.create({ name: categoryName });
-      setCategories(prev => [...prev, response.data]);
-      setNewModel(prev => ({ ...prev, category: response.data._id }));
-    } catch (error) {
-      console.error('Error creating category:', error);
+  const handleInputChange = (e) => {
+    setSearchTerm(e.target.value);
+    if (e.target.value.length >= 2) {
+      setShowResults(true);
     }
   };
 
-  const handleCreateNewBrand = async () => {
-    const brandName = prompt('Enter new brand name:');
-    if (!brandName) return;
-    
-    try {
-      const response = await brandService.create({ name: brandName });
-      setBrands(prev => [...prev, response.data]);
-      setNewModel(prev => ({ ...prev, brand: response.data._id }));
-    } catch (error) {
-      console.error('Error creating brand:', error);
-    }
+  const getTypeDisplayName = (type) => {
+    const typeNames = {
+      all: 'All',
+      parties: 'Clients',
+      quotations: 'Quotations',
+      components: 'Components',
+      brands: 'Brands',
+      products: 'Products',
+      categories: 'Categories'
+    };
+    return typeNames[type] || type;
+  };
+
+  const getResultTypeColor = (type) => {
+    const colors = {
+      party: 'primary',
+      quotation: 'success',
+      component: 'warning',
+      brand: 'info',
+      product: 'secondary',
+      category: 'dark'
+    };
+    return colors[type] || 'light';
   };
 
   return (
-    <>
-      <Form.Group className="mb-3">
-        <Form.Label>Search Components</Form.Label>
+    <div className={`position-relative ${className}`} ref={searchRef}>
+      <InputGroup size={size}>
+        {searchTypes.length > 1 && (
+          <Dropdown>
+            <Dropdown.Toggle variant="outline-secondary" size={size}>
+              {getTypeDisplayName(selectedType)}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={() => setSelectedType('all')}>
+                All Types
+              </Dropdown.Item>
+              <Dropdown.Divider />
+              {searchTypes.map(type => (
+                <Dropdown.Item 
+                  key={type}
+                  onClick={() => setSelectedType(type)}
+                  active={selectedType === type}
+                >
+                  {getTypeDisplayName(type)}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+        )}
+        
         <Form.Control
           type="text"
-          placeholder="Search by model name or HSN code..."
+          placeholder={placeholder}
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={handleInputChange}
+          onFocus={() => searchResults.length > 0 && setShowResults(true)}
+          autoFocus={autoFocus}
         />
-      </Form.Group>
-      
-      {loading && <div className="text-center">Searching...</div>}
-      
-      {searchResults.length > 0 && (
-        <ListGroup className="mb-3">
-          {searchResults.map(model => (
-            <ListGroup.Item
-              key={model._id}
-              action
-              onClick={() => handleSelect(model)}
-              className="d-flex justify-content-between align-items-center"
-            >
-              <div>
-                <div><strong>{model.name}</strong></div>
-                <div className="text-muted small">
-                  {model.category.name} | {model.brand.name} | HSN: {model.hsn}
-                </div>
-              </div>
-              <div>₹{model.salesPrice.toLocaleString()}</div>
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
-      )}
-      
-      {searchTerm.length >= 2 && searchResults.length === 0 && !loading && (
-        <div className="text-center mb-3">
-          <p>No components found. Would you like to create a new one?</p>
-          <Button variant="primary" onClick={handleCreateNewClick}>
-            Create New Component
+        
+        {loading && (
+          <InputGroup.Text>
+            <Spinner size="sm" animation="border" />
+          </InputGroup.Text>
+        )}
+        
+        {searchTerm && (
+          <Button 
+            variant="outline-secondary" 
+            onClick={() => {
+              setSearchTerm('');
+              setSearchResults([]);
+              setShowResults(false);
+            }}
+          >
+            ✕
           </Button>
+        )}
+      </InputGroup>
+
+      {/* Search Results Dropdown */}
+      {showResults && searchResults.length > 0 && (
+        <div 
+          ref={resultsRef}
+          className="position-absolute w-100 mt-1 shadow-lg border rounded bg-white"
+          style={{ zIndex: 1050, maxHeight: '400px', overflowY: 'auto' }}
+        >
+          <ListGroup variant="flush">
+            {searchResults.map((result, index) => (
+              <ListGroup.Item
+                key={`${result.type}-${result.id}-${index}`}
+                action
+                onClick={() => handleSelect(result)}
+                className="d-flex align-items-center py-3"
+                style={{ cursor: 'pointer' }}
+              >
+                <div className="me-3">
+                  <span style={{ fontSize: '1.2em' }}>{result.icon}</span>
+                </div>
+                <div className="flex-grow-1">
+                  <div className="d-flex justify-content-between align-items-start">
+                    <div>
+                      <div className="fw-bold">{result.title}</div>
+                      <small className="text-muted">{result.subtitle}</small>
+                    </div>
+                    <Badge bg={getResultTypeColor(result.type)} className="ms-2">
+                      {result.type}
+                    </Badge>
+                  </div>
+                </div>
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+          
+          {searchResults.length === 0 && !loading && (
+            <ListGroup.Item className="text-center text-muted py-3">
+              No results found for "{searchTerm}"
+            </ListGroup.Item>
+          )}
         </div>
       )}
-
-      {/* Modal for creating new model */}
-      <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Create New Component</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleNewModelSubmit}>
-            <Form.Group className="mb-3">
-              <Form.Label>Model Name</Form.Label>
-              <Form.Control
-                type="text"
-                name="name"
-                value={newModel.name}
-                onChange={handleNewModelChange}
-                required
-              />
-            </Form.Group>
-            
-            <Form.Group className="mb-3">
-              <Form.Label>Category</Form.Label>
-              <div className="d-flex">
-                <Form.Select
-                  name="category"
-                  value={newModel.category}
-                  onChange={handleNewModelChange}
-                  required
-                  className="me-2"
-                >
-                  <option value="">Select Category</option>
-                  {categories.map(category => (
-                    <option key={category._id} value={category._id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </Form.Select>
-                <Button 
-                  variant="outline-secondary" 
-                  onClick={handleCreateNewCategory}
-                  type="button"
-                >
-                  +
-                </Button>
-              </div>
-            </Form.Group>
-            
-            <Form.Group className="mb-3">
-              <Form.Label>Brand</Form.Label>
-              <div className="d-flex">
-                <Form.Select
-                  name="brand"
-                  value={newModel.brand}
-                  onChange={handleNewModelChange}
-                  required
-                  className="me-2"
-                >
-                  <option value="">Select Brand</option>
-                  {brands.map(brand => (
-                    <option key={brand._id} value={brand._id}>
-                      {brand.name}
-                    </option>
-                  ))}
-                </Form.Select>
-                <Button 
-                  variant="outline-secondary" 
-                  onClick={handleCreateNewBrand}
-                  type="button"
-                >
-                  +
-                </Button>
-              </div>
-            </Form.Group>
-            
-            <Form.Group className="mb-3">
-              <Form.Label>HSN Code</Form.Label>
-              <Form.Control
-                type="text"
-                name="hsn"
-                value={newModel.hsn}
-                onChange={handleNewModelChange}
-                required
-              />
-            </Form.Group>
-            
-            <Form.Group className="mb-3">
-              <Form.Label>Warranty</Form.Label>
-              <Form.Control
-                type="text"
-                name="warranty"
-                value={newModel.warranty}
-                onChange={handleNewModelChange}
-                required
-                placeholder="e.g., 1 Year"
-              />
-            </Form.Group>
-            
-            <Form.Group className="mb-3">
-              <Form.Label>Purchase Price (with GST)</Form.Label>
-              <Form.Control
-                type="number"
-                name="purchasePrice"
-                value={newModel.purchasePrice}
-                onChange={handleNewModelChange}
-                required
-                min="0"
-                step="0.01"
-              />
-            </Form.Group>
-            
-            <Form.Group className="mb-3">
-              <Form.Label>Sales Price (with GST)</Form.Label>
-              <Form.Control
-                type="number"
-                name="salesPrice"
-                value={newModel.salesPrice}
-                onChange={handleNewModelChange}
-                required
-                min="0"
-                step="0.01"
-              />
-            </Form.Group>
-            
-            <Form.Group className="mb-3">
-              <Form.Label>GST Rate (%)</Form.Label>
-              <Form.Control
-                type="number"
-                name="gstRate"
-                value={newModel.gstRate}
-                onChange={handleNewModelChange}
-                required
-                min="0"
-                max="28"
-              />
-            </Form.Group>
-            
-            <div className="d-flex justify-content-end">
-              <Button variant="secondary" onClick={() => setShowCreateModal(false)} className="me-2">
-                Cancel
-              </Button>
-              <Button variant="primary" type="submit">
-                Create Component
-              </Button>
-            </div>
-          </Form>
-        </Modal.Body>
-      </Modal>
-    </>
+    </div>
   );
 };
 
